@@ -1,0 +1,252 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+}
+
+/* a {
+  text-decoration: none;
+  color: #333333;
+} */
+
+:root {
+  --color-181818: #181818;
+  --color-ffd333: #d50101;
+  --color-47ad24: #47ad24;
+  --color-e52e2e: #e52e2e;
+  --color-828599: #828599;
+  --color-3d464d: #3d464d;
+  --color-c3d4da: #c3d4da;
+}
+
+/* dashboard */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-sider {
+  flex: 0 0 250px !important;
+  max-width: 250px !important;
+  min-height: 250px !important;
+  width: 250px !important;
+}
+.ant-layout-sider-collapsed {
+  flex: 0 0 80px !important;
+  max-width: 80px !important;
+  min-height: 80px !important;
+  width: 80px !important;
+}
+
+main {
+  height: 85vh;
+  overflow-y: scroll;
+  background-color: transparent !important;
+}
+
+main::-webkit-scrollbar {
+  width: 0px;
+}
+
+.demo-logo-vertical {
+  background-color: var(--color-ffd333);
+  margin: 0;
+  height: 64px;
+}
+
+.sm_logo {
+  display: none;
+}
+.ant-layout-sider-collapsed .sm_logo {
+  display: block;
+}
+.ant-layout-sider-collapsed .lg_logo {
+  display: none;
+}
+
+.ant-menu-title-content {
+  font-size: 16px;
+}
+
+.ant-layout-header h5 {
+  line-height: 30px;
+  font-size: 14px;
+}
+.ant-layout-header p {
+  line-height: 20px;
+  font-size: 13px;
+}
+
+.topImg {
+  height: 32px;
+  width: 32px;
+}
+
+.ant-layout-header div .badge {
+  top: 15px;
+  right: 0px;
+}
+.ant-layout-header .notificationIcon {
+  font-size: 25px;
+}
+
+.green {
+  color: var(--color-47ad24);
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+}
+.red {
+  color: var(--color-e52e2e);
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+}
+
+.form-control {
+  box-shadow: none !important;
+  border-color: var(--color-c3d4da);
+}
+
+.title {
+  font-size: 28px;
+  font-family: "Roboto", sans-serif;
+  color: var(--color-181818);
+}
+
+.sub_title {
+  font-size: 24px;
+  font-family: "Roboto", sans-serif;
+  color: var(--color-181818);
+}
+.desc {
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  color: var(--color-828599);
+}
+
+/* dashboard */
+
+/* login */
+
+.error {
+  color: red;
+  font-size: 14px;
+}
+
+/* login */
+
+/* add product */
+
+.ql-container.ql-snow {
+  height: 100px;
+}
+
+.rw-multiselect-taglist {
+  padding: 11px 0px;
+  font-size: 1rem;
+}
+
+p.addImgText {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #878a9a;
+  margin-top: 0px;
+}
+
+.addImgIcon {
+  color: #5256ad;
+  font-size: 60px;
+  transition: 0.3s;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.addImgIcon:hover {
+  opacity: 0.8;
+}
+
+.uploadPictureContainer {
+  width: 25%;
+  height: inherit;
+  margin: 10px;
+  padding: 10px;
+  background: #edf2f6;
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d0dbe4;
+  position: relative;
+}
+
+.deleteImage {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  color: #fff;
+  background: #ff4081;
+  border-radius: 50%;
+  text-align: center;
+  cursor: pointer;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+}
+
+.photoCard {
+  background: #fff;
+  box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.05);
+  position: relative;
+  border-radius: 10px;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 10px auto;
+  transition: all 0.3s ease-in;
+}
+
+.colorSelect {
+  margin-bottom: 30px;
+}
+
+:where(.css-dev-only-do-not-override-6j9yrn).ant-select-multiple
+  .ant-select-selector {
+  display: flex;
+  padding: 20px 5px;
+}
+
+.uploadIcon {
+  width: 80px;
+  height: 80px;
+}
+
+.uploadIconText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chooseFileButton {
+  padding: 6px 23px;
+  background: #545972;
+  border-radius: 30px;
+  color: #fff;
+  font-weight: 300;
+  font-size: 14px;
+  margin: 10px 0;
+  transition: all 0.2s ease-in;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+
+/* add product */
+
+/* productList */
+.productImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+/* productList */

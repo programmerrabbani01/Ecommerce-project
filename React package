@@ -1,0 +1,12 @@
+for marquee slider => npm i react-fast-marquee
+
+for show page name top bar => npm i react-helmet
+
+for rating star => npm i react-rating-stars-component
+
+npm i react-image-zoom or npm i react-image-magnify --force
+
+https://www.npmjs.com/package/react-images-upload/v/1.2.7
+https://www.npmjs.com/package/react-images-uploader
+https://www.bytescale.com/docs/upload-widget/react
+
