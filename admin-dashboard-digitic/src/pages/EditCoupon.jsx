@@ -4,13 +4,17 @@ import { useFormik } from "formik";
 import { date, number, object, string } from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { createCoupons } from "../features/coupon/couponApiSlice.js";
+import {
+  getASingleCoupon,
+  updateCoupon,
+} from "../features/coupon/couponApiSlice.js";
 
 import { createToaster } from "../utils/toastify.js";
 import {
   getAllCouponsData,
   setMessageEmpty,
 } from "../features/coupon/couponSlice.js";
+import { useNavigate, useParams } from "react-router-dom";
 
 let schema = object({
   name: string().required("Name Is Required"),
@@ -18,12 +22,17 @@ let schema = object({
   discount: number().required("Discount Is Required"),
 });
 
-const AddCoupon = () => {
-  const title = "Add Coupon - Digitic";
+const EditCoupon = () => {
+  const title = "Edit Coupon - FLASHMART";
 
   const dispatch = useDispatch();
-  
-  const { error, message } = useSelector(getAllCouponsData);
+
+  const navigate = useNavigate();
+
+  const { id } = useParams();
+
+  const { error, message, loader, singleCoupon } =
+    useSelector(getAllCouponsData);
 
   // initial values
 
@@ -34,13 +43,14 @@ const AddCoupon = () => {
       discount: "",
     },
     validationSchema: schema,
-    onSubmit: async (values, { resetForm }) => {
-
-      dispatch(createCoupons(values));
-      // Reset the form after submission
-      resetForm();
+    onSubmit: async (values) => {
+      dispatch(updateCoupon({ values, id }));
     },
   });
+
+  useEffect(() => {
+    dispatch(getASingleCoupon(id));
+  }, [dispatch, id]);
 
   // handle messages
 
@@ -52,8 +62,32 @@ const AddCoupon = () => {
     if (message) {
       createToaster(message, "success");
       dispatch(setMessageEmpty());
+      navigate("/couponList");
     }
-  }, [dispatch, error, message]);
+  }, [dispatch, error, message, navigate]);
+
+  // set previous values
+
+  useEffect(() => {
+    if (singleCoupon) {
+      const formattedExpireDate = singleCoupon.expire
+        ? new Date(singleCoupon.expire).toISOString().split("T")[0]
+        : "";
+
+      formik.setValues({
+        ...formik.values,
+        name: singleCoupon?.name || "",
+        expire: formattedExpireDate,
+        discount: singleCoupon?.discount || "",
+      });
+    }
+  }, [singleCoupon, formik.setValues]);
+
+  if (loader) {
+    return <>Loading . . . .</>;
+  } else if (loader || singleCoupon == null) {
+    return navigate("/couponList");
+  }
 
   return (
     <>
@@ -61,7 +95,7 @@ const AddCoupon = () => {
 
       {/*  */}
 
-      <h3 className="mb-4 title">Add Coupon</h3>
+      <h3 className="mb-4 title">Edit Coupon</h3>
 
       <div className="">
         <form onSubmit={formik.handleSubmit}>
@@ -126,4 +160,4 @@ const AddCoupon = () => {
   );
 };
 
-export default AddCoupon;
+export default EditCoupon;

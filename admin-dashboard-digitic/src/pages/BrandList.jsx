@@ -75,7 +75,7 @@ const BrandList = () => {
     tableData.push(...data1);
   }
 
-  // delete products
+  // delete brand
   const handleBrandDelete = (id) => {
     if (id) {
       swal({

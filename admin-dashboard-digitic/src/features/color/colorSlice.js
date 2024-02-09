@@ -12,7 +12,7 @@ import {
 const colorSlice = createSlice({
   name: "color",
   initialState: {
-    colors: null,
+    colors: [],
     error: null,
     message: null,
     loader: false,

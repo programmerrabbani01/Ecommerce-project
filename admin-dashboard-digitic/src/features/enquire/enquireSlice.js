@@ -6,7 +6,7 @@ import { getAllEnquires } from "./enquireApiSlice.js";
 const enquireSlice = createSlice({
   name: "enquire",
   initialState: {
-    enquires: null,
+    enquires: [],
     error: null,
     message: null,
     loader: false,

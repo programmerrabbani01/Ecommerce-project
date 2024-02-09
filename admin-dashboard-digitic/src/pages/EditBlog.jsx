@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import { object, string } from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { createBlogs } from "../features/blog/blogApiSlice.js";
+import { getASingleBlog, updateBlog } from "../features/blog/blogApiSlice.js";
 import { getAllBlogCategory } from "../features/blogCategory/blogCategoryApiSlice.js";
 import { getAllBlogsCategoryData } from "../features/blogCategory/blogCategorySlice.js";
 import {
@@ -15,44 +15,58 @@ import {
   setMessageEmpty,
 } from "../features/blog/blogSlice.js";
 import { createToaster } from "../utils/toastify.js";
+import { useNavigate, useParams } from "react-router-dom";
 
 let schema = object({
   title: string().required("Title Is Required"),
   description: string().required("Description Is Required"),
   category: string().required("Category Is Required"),
 });
-
-const AddBlog = () => {
-  const title = "Add Blog - Digitic";
+const EditBlog = () => {
+  const title = "Edit Blog - Digitic";
 
   const editor = useRef(null);
 
   const dispatch = useDispatch();
 
-  const [blogLogo, setBlogLogo] = useState([]);
+  const navigate = useNavigate();
+
+  const [preview, setPreview] = useState(null);
+
+  const { id } = useParams();
+
+  // const [blogLogo, setBlogLogo] = useState([]);
 
   const { blogCategories } = useSelector(getAllBlogsCategoryData);
 
-  const { error, message } = useSelector(getAllBlogsData);
+  const { error, message, loader, singleBlog } = useSelector(getAllBlogsData);
 
-  // preview logo
+  console.log(singleBlog);
+
+  // Initialize brandLogo using newBrands
+
+  const [blogLogo, setBlogLogo] = useState(
+    singleBlog?.image ? [{ file: null, preview: singleBlog.image }] : []
+  );
+
+  // photo preview
 
   const handleLogoPreview = (acceptedFiles) => {
-    const selectedFiles = acceptedFiles.map((file) => {
-      return {
-        file: file,
-        preview: URL.createObjectURL(file),
-      };
-    });
-    setBlogLogo([...blogLogo, ...selectedFiles]);
+    const selectedFiles = acceptedFiles.map((file) => ({
+      file: file,
+      preview: URL.createObjectURL(file),
+    }));
+    setBlogLogo(selectedFiles);
+    setPreview(selectedFiles[0].preview);
   };
 
-  // remove blog photos
+  // remove photo
 
   const handleRemoveLogo = (index) => {
     const updatedLogos = [...blogLogo];
     updatedLogos.splice(index, 1);
     setBlogLogo(updatedLogos);
+    setPreview(updatedLogos.length > 0 ? updatedLogos[0].preview : null);
   };
 
   // initial values
@@ -65,24 +79,25 @@ const AddBlog = () => {
       image: "",
     },
     validationSchema: schema,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       const form_data = new FormData();
 
       form_data.append("title", values.title);
       form_data.append("description", values.description);
       form_data.append("category", values.category);
 
-      values.blogLogo.forEach((logo) => {
-        form_data.append(`blogLogo`, logo.file);
-      });
+      if (blogLogo && blogLogo.length > 0) {
+        form_data.append("blogLogo", blogLogo[0].file);
+      }
 
-      dispatch(createBlogs(form_data));
-
-      // Reset the form after submission
-      resetForm();
-      setBlogLogo([]);
+      dispatch(updateBlog({ id, form_data }));
     },
   });
+
+  // get single brands
+  useEffect(() => {
+    dispatch(getASingleBlog(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     dispatch(getAllBlogCategory());
@@ -102,8 +117,33 @@ const AddBlog = () => {
     if (message) {
       createToaster(message, "success");
       dispatch(setMessageEmpty());
+      navigate("/blogList");
     }
   }, [dispatch, error, message]);
+
+  // get previous values
+
+  useEffect(() => {
+    // Check if singleBrand is not null before setting brandLogo
+    if (singleBlog) {
+      setBlogLogo(
+        singleBlog.image ? [{ file: null, preview: singleBlog.image }] : []
+      );
+
+      formik.setValues({
+        ...formik.values,
+        title: singleBlog.title || "",
+        category: singleBlog.category || "",
+        description: singleBlog.description || "",
+      });
+    }
+  }, [singleBlog, formik.setValues]);
+
+  if (loader) {
+    return <>Loading ....</>;
+  } else if (loader || singleBlog == null) {
+    return navigate("/blogList");
+  }
 
   return (
     <>
@@ -111,49 +151,45 @@ const AddBlog = () => {
 
       {/*  */}
 
-      <h3 className="mb-4 title">Add Blog</h3>
+      <h3 className="mb-4 title">Edit Blog</h3>
 
       <div className="">
         <form onSubmit={formik.handleSubmit}>
           <div className="photoCard">
-            <Dropzone onDrop={handleLogoPreview}>
+            <Dropzone
+              onDrop={(acceptedFiles) => handleLogoPreview(acceptedFiles)}
+            >
               {({ getRootProps, getInputProps }) => (
-                <>
+                <div>
                   <section>
-                    <div className="uploadIconText">
+                    <div {...getRootProps()} className="uploadIconText">
+                      <input {...getInputProps()} accept="image/*" />
                       <img
                         src="https://i.ibb.co/VJyrmFP/upload-Icon.png"
                         alt=""
                         className="uploadIcon"
                       />
-                      <p className="addImgText">click to select files</p>
-                    </div>
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
-
-                      <button type="button" className="chooseFileButton">
-                        Choose images
-                      </button>
+                      <p className="addImgText">Click to select files</p>
                     </div>
                   </section>
-                  <div className="showImage d-flex flex-wrap justify-content-center">
-                    {blogLogo?.map((logo, index) => (
-                      <div key={index} className="uploadPictureContainer">
+                  {(blogLogo.length > 0 || singleBlog.length > 0) && (
+                    <div className="showImage d-flex flex-wrap justify-content-center">
+                      <div className="uploadPictureContainer">
                         <div
                           className="deleteImage"
-                          onClick={() => handleRemoveLogo(index)}
+                          onClick={() => handleRemoveLogo(0)}
                         >
                           X
                         </div>
                         <img
                           style={{ width: "100%" }}
-                          src={logo.preview}
+                          src={preview ?? blogLogo[0]?.preview ?? ""}
                           alt=""
                         />
                       </div>
-                    ))}
-                  </div>
-                </>
+                    </div>
+                  )}
+                </div>
               )}
             </Dropzone>
           </div>
@@ -214,7 +250,7 @@ const AddBlog = () => {
             style={{ backgroundColor: "#d50101" }}
             type="submit"
           >
-            Add Blog
+            Update Blog
           </button>
         </form>
       </div>
@@ -222,4 +258,4 @@ const AddBlog = () => {
   );
 };
 
-export default AddBlog;
+export default EditBlog;

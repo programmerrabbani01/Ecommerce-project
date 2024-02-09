@@ -136,7 +136,7 @@ const MainLayout = () => {
                 label: "Marketing",
                 children: [
                   {
-                    key: "/addCoupon",
+                    key: "/coupon",
                     icon: <IoIosAddCircleOutline className="fs-5" />,
                     label: "Add Coupon",
                   },
@@ -153,7 +153,7 @@ const MainLayout = () => {
                 label: "Blogs",
                 children: [
                   {
-                    key: "/addBlog",
+                    key: "/blog",
                     icon: <IoIosAddCircleOutline className="fs-5" />,
                     label: "Add Blog",
                   },
@@ -163,7 +163,7 @@ const MainLayout = () => {
                     label: "Blog List",
                   },
                   {
-                    key: "/addBlogCategory",
+                    key: "/blogCategory",
                     icon: <IoIosAddCircleOutline className="fs-5" />,
                     label: "Add Blog Category",
                   },

@@ -41,3 +41,64 @@ export const createBlogCategory = createAsyncThunk(
     }
   }
 );
+
+// get single blog category
+
+export const getSingleBlogCategory = createAsyncThunk(
+  "blogCategory/getSingleBlogCategory",
+  async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5050/api/v1/blogCategory/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+// update blog category
+
+export const updateBlogCategory = createAsyncThunk(
+  "blogCategory/updateBlogCategory",
+  async (data) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:5050/api/v1/blogCategory/${data.id}`,
+        data.values,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+// delete blog category
+
+export const deleteBlogCategory = createAsyncThunk(
+  "blogCategory/deleteBlogCategory",
+  async (id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5050/api/v1/blogCategory/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);

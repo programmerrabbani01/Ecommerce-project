@@ -6,7 +6,7 @@ import { getAllUser } from "./userApiSlice.js";
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    users: null,
+    users: [],
     error: null,
     message: null,
   },

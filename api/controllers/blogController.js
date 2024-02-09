@@ -84,29 +84,27 @@ export const createBlog = asyncHandler(async (req, res) => {
 export const getSingleBlog = asyncHandler(async (req, res) => {
   // get params slug
 
-  const { slug } = req.params;
+  const { id } = req.params;
 
-  //find blog data
+  try {
+    const blog = await Blog.findById(id);
 
-  const blog = await Blog.findOne({ slug });
+    // blog views update
 
-  // if not found blog data
+    const blogData = await Blog.findByIdAndUpdate(
+      blog._id,
+      {
+        $inc: { numViews: 1 },
+      },
+      { new: true }
+    );
 
-  if (!blog) throw new Error("Blog not found");
+    // return blog data
 
-  // blog views update
-
-  const blogData = await Blog.findByIdAndUpdate(
-    blog._id,
-    {
-      $inc: { numViews: 1 },
-    },
-    { new: true }
-  );
-
-  // return blog data
-
-  res.status(200).json({ blog: blogData });
+    res.status(200).json(blogData);
+  } catch (error) {
+    res.status(400).json({ message: "Blog not found" });
+  }
 });
 
 /**

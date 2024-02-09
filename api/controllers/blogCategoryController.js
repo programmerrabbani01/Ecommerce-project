@@ -17,10 +17,6 @@ export const getAllBlogCategory = asyncHandler(async (req, res) => {
   //   validation
 
   if (blogCategories.length > 0) return res.status(200).json(blogCategories);
-
-  //   not found
-
-  res.status(404).json({ message: "No Blog Categories Found" });
 });
 
 /**
@@ -74,17 +70,15 @@ export const getSingleBlogCategory = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
 
-  //   find single blog category by id
+  try {
+    // find single blog category
 
-  const singleBlogCategory = await BlogCategory.findById(id);
+    const singleBlogCategory = await BlogCategory.findById(id);
 
-  // not found single blog category validation
-
-  if (!singleBlogCategory) throw new Error(" Single blog category not found");
-
-  //   get single blog category validation
-
-  res.status(200).json({ blogCategory: singleBlogCategory });
+    res.status(200).json(singleBlogCategory);
+  } catch (error) {
+    res.status(400).json({ message: " Single blog category not found" });
+  }
 });
 
 /**
@@ -144,7 +138,8 @@ export const updateBlogCategory = asyncHandler(async (req, res) => {
 
   // not found validation
 
-  if (!blogCategory) throw new Error("The blog category is not found");
+  if (!blogCategory)
+    return res.status(200).json("The blog category is not found");
 
   // update blog category
 

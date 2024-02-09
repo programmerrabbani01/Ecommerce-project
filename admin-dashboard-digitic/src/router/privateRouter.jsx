@@ -24,6 +24,9 @@ import EditBrand from "../pages/EditBrand.jsx";
 import EditTag from "../pages/EditTag.jsx";
 import EditCategory from "../pages/EditCategory.jsx";
 import EditColor from "../pages/EditColor.jsx";
+import EditBlog from "../pages/EditBlog.jsx";
+import EditBlogCategory from "../pages/EditBlogCategory.jsx";
+import EditCoupon from "../pages/EditCoupon.jsx";
 
 // create private router
 
@@ -91,16 +94,28 @@ const PrivateRouter = [
             element: <EditTag />,
           },
           {
-            path: "/addBlog",
+            path: "/blog",
             element: <AddBlog />,
           },
           {
-            path: "/addCoupon",
+            path: "/blog/:id",
+            element: <EditBlog />,
+          },
+          {
+            path: "/coupon",
             element: <AddCoupon />,
           },
           {
-            path: "/addBlogCategory",
+            path: "/coupon/:id",
+            element: <EditCoupon />,
+          },
+          {
+            path: "/blogCategory",
             element: <AddBlogCategory />,
+          },
+          {
+            path: "/blogCategory/:id",
+            element: <EditBlogCategory />,
           },
           {
             path: "/color",

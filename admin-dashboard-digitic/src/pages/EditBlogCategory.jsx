@@ -1,26 +1,26 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import CustomInput from "../components/CustomInput/CustomInput.jsx";
 import MetaData from "../components/HelmetData/MetaData.jsx";
 import { useFormik } from "formik";
 import { object, string } from "yup";
-import { useEffect } from "react";
+import { createToaster } from "../utils/toastify.js";
 import {
-  getASingleProductCategory,
-  updateProductCategory,
-} from "../features/productCategory/pCategoryApiSlice.js";
+  getAllBlogsCategoryData,
+  setMessageEmpty,
+} from "../features/blogCategory/blogCategorySlice.js";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  getAllProductCategoryData,
-  setMessageEmpty,
-} from "../features/productCategory/pCategorySlice.js";
-import { createToaster } from "../utils/toastify.js";
+  getSingleBlogCategory,
+  updateBlogCategory,
+} from "../features/blogCategory/blogCategoryApiSlice.js";
 
 let schema = object({
   name: string().required("Name Is Required"),
 });
 
-const EditCategory = () => {
-  const title = "Add Category - Digitic";
+const EditBlogCategory = () => {
+  const title = "Edit Blog Category - Digitic";
 
   const dispatch = useDispatch();
 
@@ -28,8 +28,8 @@ const EditCategory = () => {
 
   const { id } = useParams();
 
-  const { error, message, loader, singleProductCategory } = useSelector(
-    getAllProductCategoryData
+  const { error, message, singleBlogCategory, loader } = useSelector(
+    getAllBlogsCategoryData
   );
 
   const formik = useFormik({
@@ -38,15 +38,16 @@ const EditCategory = () => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
-      dispatch(updateProductCategory({ values, id }));
+      dispatch(updateBlogCategory({ values, id }));
     },
   });
 
+  //   get single blog category b
   useEffect(() => {
-    dispatch(getASingleProductCategory(id));
+    dispatch(getSingleBlogCategory(id));
   }, [dispatch, id]);
 
-  //   message handle
+  // handle messages
   useEffect(() => {
     if (error) {
       createToaster(error);
@@ -55,25 +56,25 @@ const EditCategory = () => {
     if (message) {
       createToaster(message, "success");
       dispatch(setMessageEmpty());
-      navigate("/categoryList");
+      navigate("/blogCategoryList");
     }
   }, [dispatch, error, message]);
 
   // set previous values
-  
+
   useEffect(() => {
-    if (singleProductCategory) {
+    if (singleBlogCategory) {
       formik.setValues({
         ...formik.values,
-        name: singleProductCategory?.name || "",
+        name: singleBlogCategory?.name || "",
       });
     }
-  }, [singleProductCategory, formik.setValues]);
+  }, [singleBlogCategory, formik.setValues]);
 
   if (loader) {
     return <>Loading . . . .</>;
-  } else if (loader || singleProductCategory == null) {
-    return navigate("/categoryList");
+  } else if (loader || singleBlogCategory == null) {
+    return navigate("/blogCategoryList");
   }
 
   return (
@@ -82,7 +83,7 @@ const EditCategory = () => {
 
       {/*  */}
 
-      <h3 className="mb-4 title">Edit Category</h3>
+      <h3 className="mb-4 title">Edit Blog Category</h3>
 
       <div className="">
         <form onSubmit={formik.handleSubmit}>
@@ -94,7 +95,7 @@ const EditCategory = () => {
           <div className="">
             <CustomInput
               type="text"
-              label="Enter Category Name"
+              label="Enter Blog Category Name"
               name="name"
               onChange={formik.handleChange("name")}
               onBlur={formik.handleBlur("name")}
@@ -107,7 +108,7 @@ const EditCategory = () => {
             style={{ backgroundColor: "#d50101" }}
             type="submit"
           >
-            Update Category
+            Update Blog Category
           </button>
         </form>
       </div>
@@ -115,4 +116,4 @@ const EditCategory = () => {
   );
 };
 
-export default EditCategory;
+export default EditBlogCategory;

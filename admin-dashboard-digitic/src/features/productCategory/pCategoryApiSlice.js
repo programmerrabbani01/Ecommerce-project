@@ -83,7 +83,7 @@ export const updateProductCategory = createAsyncThunk(
   }
 );
 
-// update category
+// delete category
 
 export const deleteProductCategory = createAsyncThunk(
   "productCategory/deleteProductCategory",

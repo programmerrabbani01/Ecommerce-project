@@ -6,7 +6,7 @@ import { getAllOrders } from "./orderApiSlice.js";
 const orderSlice = createSlice({
   name: "order",
   initialState: {
-    orders: null,
+    orders: [],
     error: null,
     message: null,
     loader: false,

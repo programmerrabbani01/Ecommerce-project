@@ -12,7 +12,7 @@ import {
 const productCategoriesSlice = createSlice({
   name: "productCategory",
   initialState: {
-    productCategories: null,
+    productCategories: [],
     error: null,
     message: null,
     loader: false,

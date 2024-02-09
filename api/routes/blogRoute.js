@@ -19,7 +19,7 @@ router.use(tokenVerify);
 
 //routing
 router.route("/").get(getAllBlog).post(isAdmin, blogMulter, createBlog);
-router.route("/:slug").get(getSingleBlog);
+router.route("/:id").get(getSingleBlog);
 router
   .route("/:id")
   .delete(isAdmin, blogMulter, deleteBlog)

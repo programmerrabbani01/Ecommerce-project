@@ -35,3 +35,58 @@ export const createBlogs = createAsyncThunk(
     }
   }
 );
+
+// update blog
+
+export const updateBlog = createAsyncThunk("blog/updateBlog", async (data) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:5050/api/v1/blog/${data.id}`,
+      data.form_data,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+});
+
+// delete blogs
+
+export const deleteBlogs = createAsyncThunk("blog/deleteBlogs", async (id) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:5050/api/v1/blog/${id}`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response.data.message);
+  }
+});
+
+// get single blog
+
+export const getASingleBlog = createAsyncThunk(
+  "blog/getASingleBlog",
+  async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5050/api/v1/blog/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);

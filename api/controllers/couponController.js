@@ -16,8 +16,6 @@ export const getAllCoupon = asyncHandler(async (req, res) => {
   //   validation for get all coupons
 
   if (coupons.length > 0) return res.status(200).json(coupons);
-
-
 });
 
 /**
@@ -73,17 +71,17 @@ export const getSingleCoupon = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
 
-  // find coupon by id
+  try {
+    // find coupon by id
 
-  const coupon = await Coupon.findById(id);
+    const coupon = await Coupon.findById(id);
 
-  // not found validation
+    //  get single coupon response
 
-  if (!coupon) throw new Error("Coupon not found");
-
-  //  get single coupon response
-
-  res.status(200).json({ coupon });
+    res.status(200).json(coupon);
+  } catch (error) {
+    res.status(400).json({ message: "Coupon not found" });
+  }
 });
 
 /**

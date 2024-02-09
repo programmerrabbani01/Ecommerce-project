@@ -83,7 +83,7 @@ const EditBrand = () => {
     },
   });
 
-  // get all brands
+  // get single brands
   useEffect(() => {
     dispatch(getASingleBrand(id));
   }, [dispatch, id]);

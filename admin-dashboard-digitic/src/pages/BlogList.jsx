@@ -1,12 +1,17 @@
 import { Table } from "antd";
 import MetaData from "../components/HelmetData/MetaData.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllBlogsData } from "../features/blog/blogSlice.js";
+import {
+  getAllBlogsData,
+  setMessageEmpty,
+} from "../features/blog/blogSlice.js";
 import { useEffect } from "react";
-import { getAllBlogs } from "../features/blog/blogApiSlice.js";
+import { deleteBlogs, getAllBlogs } from "../features/blog/blogApiSlice.js";
 import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";
+import swal from "sweetalert";
+import { createToaster } from "../utils/toastify.js";
 
 // table data
 const columns = [
@@ -41,7 +46,7 @@ const BlogList = () => {
 
   const dispatch = useDispatch();
 
-  const { blogs } = useSelector(getAllBlogsData);
+  const { blogs, error, message } = useSelector(getAllBlogsData);
 
   useEffect(() => {
     dispatch(getAllBlogs());
@@ -65,10 +70,13 @@ const BlogList = () => {
         ),
         action: (
           <>
-            <Link to="" className=" fs-5 text-danger">
+            <Link to={`/blog/${blogs[i]?._id}`} className=" fs-5 text-danger">
               <FaEdit />
             </Link>
-            <Link to="" className="ms-3 fs-5 text-danger">
+            <Link
+              onClick={() => handleDeleteBlog(blogs[i]?._id)}
+              className="ms-3 fs-5 text-danger"
+            >
               <FaRegTrashAlt />
             </Link>
           </>
@@ -76,6 +84,41 @@ const BlogList = () => {
       });
     }
   }
+
+  // delete blog
+  const handleDeleteBlog = (id) => {
+    if (id) {
+      swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          dispatch(deleteBlogs(id));
+          // swal("Proof! Your Imaginary File Has Been Deleted", {
+          //   icon: "success",
+          // });
+        } else {
+          swal("Your Imaginary File Is Safe!");
+        }
+      });
+    }
+  };
+
+  // messages
+
+  useEffect(() => {
+    if (error) {
+      createToaster(error);
+      dispatch(setMessageEmpty());
+    }
+    if (message) {
+      createToaster(message, "success");
+      dispatch(setMessageEmpty());
+    }
+  }, [dispatch, error, message]);
 
   return (
     <>

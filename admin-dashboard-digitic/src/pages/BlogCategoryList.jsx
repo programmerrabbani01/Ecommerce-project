@@ -5,8 +5,16 @@ import { FaEdit } from "react-icons/fa";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getAllBlogsCategoryData } from "../features/blogCategory/blogCategorySlice.js";
-import { getAllBlogCategory } from "../features/blogCategory/blogCategoryApiSlice.js";
+import {
+  getAllBlogsCategoryData,
+  setMessageEmpty,
+} from "../features/blogCategory/blogCategorySlice.js";
+import {
+  deleteBlogCategory,
+  getAllBlogCategory,
+} from "../features/blogCategory/blogCategoryApiSlice.js";
+import swal from "sweetalert";
+import { createToaster } from "../utils/toastify.js";
 
 // table data
 const columns = [
@@ -30,7 +38,9 @@ const BlogCategoryList = () => {
 
   const dispatch = useDispatch();
 
-  const { blogCategories } = useSelector(getAllBlogsCategoryData);
+  const { error, message, blogCategories } = useSelector(
+    getAllBlogsCategoryData
+  );
 
   useEffect(() => {
     dispatch(getAllBlogCategory());
@@ -46,10 +56,16 @@ const BlogCategoryList = () => {
         category: blogCategories[i].category,
         action: (
           <>
-            <Link to="" className=" fs-5 text-danger">
+            <Link
+              to={`/blogCategory/${blogCategories[i]?._id}`}
+              className=" fs-5 text-danger"
+            >
               <FaEdit />
             </Link>
-            <Link to="" className="ms-3 fs-5 text-danger">
+            <Link
+              onClick={() => handleDeleteBlogCategory(blogCategories[i]?._id)}
+              className="ms-3 fs-5 text-danger"
+            >
               <FaRegTrashAlt />
             </Link>
           </>
@@ -57,6 +73,40 @@ const BlogCategoryList = () => {
       });
     }
   }
+
+  // delete blog
+  const handleDeleteBlogCategory = (id) => {
+    if (id) {
+      swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      }).then((willDelete) => {
+        if (willDelete) {
+          dispatch(deleteBlogCategory(id));
+          // swal("Proof! Your Imaginary File Has Been Deleted", {
+          //   icon: "success",
+          // });
+        } else {
+          swal("Your Imaginary File Is Safe!");
+        }
+      });
+    }
+  };
+
+  // handle messages
+  useEffect(() => {
+    if (error) {
+      createToaster(error);
+      dispatch(setMessageEmpty());
+    }
+    if (message) {
+      createToaster(message, "success");
+      dispatch(setMessageEmpty());
+    }
+  }, [dispatch, error, message]);
 
   return (
     <>
