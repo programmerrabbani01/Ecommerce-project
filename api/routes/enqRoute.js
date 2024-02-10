@@ -6,6 +6,7 @@ import {
   deleteEnquire,
   getAllEnquires,
   getSingleEnquire,
+  updateEnqStatus,
   updateEnquire,
 } from "../controllers/enqController.js";
 
@@ -22,6 +23,7 @@ router
   .get(getSingleEnquire)
   .delete(isAdmin, deleteEnquire)
   .patch(isAdmin, updateEnquire);
+router.route("/status/:id").patch(isAdmin, updateEnqStatus);
 
 //export
 export default router;

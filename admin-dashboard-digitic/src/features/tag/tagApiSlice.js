@@ -49,21 +49,24 @@ export const getSingleTag = createAsyncThunk("tag/getSingleTag", async (id) => {
 
 // update tag
 
-export const updateTagApi = createAsyncThunk("tag/updateTag", async (data) => {
-  try {
-    const response = await axios.patch(
-      `http://localhost:5050/api/v1/tag/${data.id}`,
-      data.values,
-      {
-        withCredentials: true,
-      }
-    );
+export const updateTagApi = createAsyncThunk(
+  "tag/updateTagApi",
+  async (data) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:5050/api/v1/tag/${data.id}`,
+        data.values,
+        {
+          withCredentials: true,
+        }
+      );
 
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response.data.message);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
   }
-});
+);
 
 // delete tag
 

@@ -27,6 +27,7 @@ import EditColor from "../pages/EditColor.jsx";
 import EditBlog from "../pages/EditBlog.jsx";
 import EditBlogCategory from "../pages/EditBlogCategory.jsx";
 import EditCoupon from "../pages/EditCoupon.jsx";
+import EnquiresView from "../pages/EnquiresView.jsx";
 
 // create private router
 
@@ -44,6 +45,10 @@ const PrivateRouter = [
           {
             path: "/enquires",
             element: <Enquires />,
+          },
+          {
+            path: "/enquires/:id",
+            element: <EnquiresView />,
           },
           {
             path: "/blogCategoryList",

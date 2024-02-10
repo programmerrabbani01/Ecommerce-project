@@ -119,7 +119,7 @@ const EditBlog = () => {
       dispatch(setMessageEmpty());
       navigate("/blogList");
     }
-  }, [dispatch, error, message]);
+  }, [dispatch, error, message,navigate]);
 
   // get previous values
 

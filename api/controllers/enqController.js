@@ -32,7 +32,7 @@ export const getAllEnquires = asyncHandler(async (req, res) => {
 export const createEnquire = asyncHandler(async (req, res) => {
   // get data from body
 
-  const { name, email, mobile, comment } = req.body;
+  const { name, email, mobile, comment, status } = req.body;
 
   // name fields required validation
 
@@ -54,6 +54,7 @@ export const createEnquire = asyncHandler(async (req, res) => {
     email,
     mobile,
     comment,
+    status,
   });
 
   //   create new Enquire response
@@ -73,17 +74,17 @@ export const getSingleEnquire = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
 
-  // find single Enquire by id
+  try {
+    // find single Enquire by id
 
-  const enquire = await Enq.findById(id);
+    const enquire = await Enq.findById(id);
 
-  // not found validation
+    //  get single Enquire response
 
-  if (!enquire) throw new Error("Enquire not found");
-
-  //  get single Enquire response
-
-  res.status(200).json({ enquire });
+    res.status(200).json(enquire);
+  } catch (error) {
+    res.status(400).json({ message: "Enquire not found" });
+  }
 });
 
 /**
@@ -150,7 +151,41 @@ export const updateEnquire = asyncHandler(async (req, res) => {
 
   // enquire update response
 
-  res
-    .status(200)
-    .json({ message: "enquire update successful", enquire: enquire });
+  res.status(200).json({ message: "enquire update successful", enquire });
+});
+
+/**
+ * @description update a enquire status
+ * @route /api/v1/enquire/status/:id
+ * @method PATCH
+ * @access public
+ */
+
+export const updateEnqStatus = asyncHandler(async (req, res) => {
+  // get enquire id from params
+
+  const { id } = req.params;
+
+  // get data from body
+
+  const { status } = req.body;
+
+  // update status
+
+  const updateEnqStatus = await Enq.findByIdAndUpdate(
+    id,
+    {
+      status: status,
+    },
+    {
+      new: true,
+    }
+  );
+
+  // update the status response
+
+  res.status(200).json({
+    message: "Enquiry StatusUpdate Successful",
+    enquiry: updateEnqStatus,
+  });
 });

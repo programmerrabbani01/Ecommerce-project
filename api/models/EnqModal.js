@@ -26,6 +26,11 @@ const enqSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    status: {
+      type: String,
+      default: "Submitted",
+      enum: ["Submitted", "Contacted", "In Progress", "Resolved"],
+    },
   },
   { timestamps: true }
 );
