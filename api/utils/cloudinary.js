@@ -19,7 +19,7 @@ export const cloudUpload = async (req) => {
 export const cloudUploads = async (path) => {
   const data = await cloudinary.v2.uploader.upload(path);
 
-  return data.secure_url;
+  return data;
 };
 
 export const cloudDelete = async (publicId) => {

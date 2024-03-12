@@ -10,7 +10,7 @@ let schema = object({
 });
 
 const AddCategory = () => {
-  const title = "Add Category - Digitic";
+  const title = "Add Category - FLASHMART";
 
   const dispatch = useDispatch();
 

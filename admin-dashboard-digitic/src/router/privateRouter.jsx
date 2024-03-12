@@ -28,6 +28,11 @@ import EditBlog from "../pages/EditBlog.jsx";
 import EditBlogCategory from "../pages/EditBlogCategory.jsx";
 import EditCoupon from "../pages/EditCoupon.jsx";
 import EnquiresView from "../pages/EnquiresView.jsx";
+import AddSize from "../pages/AddSize.jsx";
+import SizeList from "../pages/SizeList.jsx";
+import OrderView from "../pages/OrderView.jsx";
+import EditProduct from "../pages/EditProduct.jsx";
+import Profile from "../pages/Profile.jsx";
 
 // create private router
 
@@ -87,8 +92,16 @@ const PrivateRouter = [
             element: <Orders />,
           },
           {
+            path: "/orders/:id",
+            element: <OrderView />,
+          },
+          {
             path: "/products",
             element: <Products />,
+          },
+          {
+            path: "/products/:id",
+            element: <EditProduct />,
           },
           {
             path: "/tagList",
@@ -97,6 +110,10 @@ const PrivateRouter = [
           {
             path: "/tag/:id",
             element: <EditTag />,
+          },
+          {
+            path: "/sizeList",
+            element: <SizeList />,
           },
           {
             path: "/blog",
@@ -147,8 +164,16 @@ const PrivateRouter = [
             element: <AddTag />,
           },
           {
+            path: "/size",
+            element: <AddSize />,
+          },
+          {
             path: "/addProduct",
             element: <AddProduct />,
+          },
+          {
+            path: "/profile",
+            element: <Profile />,
           },
         ],
       },

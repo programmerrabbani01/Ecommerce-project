@@ -1,5 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { adminLogin, logOutUser, loggedInUser } from "./authApiSlice.js";
+import {
+  ProfileUpdate,
+  adminLogin,
+  forgotPasswordMail,
+  logOutUser,
+  loggedInUser,
+  resetPassword,
+} from "./authApiSlice.js";
 
 // create auth slice
 
@@ -11,6 +18,7 @@ const authSlice = createSlice({
       : null,
     message: null,
     error: null,
+    loader: false,
   },
   reducers: {
     setMessageEmpty: (state) => {
@@ -39,6 +47,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
+      // loggedIn
       .addCase(loggedInUser.rejected, (state, action) => {
         state.error = action.error.message;
         state.user = null;
@@ -46,10 +55,57 @@ const authSlice = createSlice({
       .addCase(loggedInUser.fulfilled, (state, action) => {
         state.user = action.payload;
         localStorage.setItem("user", JSON.stringify(action.payload));
-      }).addCase(logOutUser.fulfilled, (state, action) => {
+      })
+      // logOut
+      .addCase(logOutUser.fulfilled, (state, action) => {
         state.message = action.payload.message;
         state.user = null;
         localStorage.removeItem("user");
+      })
+      // update profile
+      .addCase(ProfileUpdate.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(ProfileUpdate.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.message = null;
+        state.loader = false;
+      })
+      .addCase(ProfileUpdate.fulfilled, (state, action) => {
+        state.error = null;
+        state.message = action.payload.message;
+        state.loader = false;
+        state.user = action.payload.user;
+        if (action.payload.user) {
+          localStorage.setItem("user", JSON.stringify(action.payload.user));
+        }
+      }) 
+      //forgot password mail send
+      .addCase(forgotPasswordMail.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(forgotPasswordMail.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(forgotPasswordMail.fulfilled, (state, action) => {
+        state.error = null;
+        state.message = action.payload.message;
+        state.loader = false;
+
+      })
+      //Reset new password
+      .addCase(resetPassword.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.error = null;
+        state.message = action.payload.message;
+        state.loader = false;
       });
   },
 });

@@ -3,15 +3,14 @@ import BreadCum from "../components/BreadCum.jsx";
 import MetaData from "../components/MetaData.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import ProductSidebar from "../components/ProductSidebar.jsx";
+import { useSelector } from "react-redux";
 
 const OurStore = () => {
-  const title = "Our Store - Digitic";
-
+  const title = "Our Store - FLASHMART";
   const [grid, setGrid] = useState(4);
 
-  const handleGridChange = (newGrid) => {
-    setGrid(newGrid);
-  };
+  const { products } = useSelector((state) => state.product);
+  const { wishlist } = useSelector((state) => state.userAuth);
 
   return (
     <>
@@ -74,28 +73,28 @@ const OurStore = () => {
                     <p className="total_products mb-0">21 Products</p>
                     <div className="d-flex gap-10 align-items-center grid_img">
                       <img
-                        onClick={() => handleGridChange(3)}
+                        onClick={() => setGrid(3)}
                         src="/images/gr4.svg"
                         className="d-block img-fluid"
                         alt="grid"
                       />
 
                       <img
-                        onClick={() => handleGridChange(4)}
+                        onClick={() => setGrid(4)}
                         src="/images/gr3.svg"
                         className="d-block img-fluid"
                         alt="grid"
                       />
 
                       <img
-                        onClick={() => handleGridChange(6)}
+                        onClick={() => setGrid(6)}
                         src="/images/gr2.svg"
                         className="d-block img-fluid"
                         alt="grid"
                       />
 
                       <img
-                        onClick={() => handleGridChange(12)}
+                        onClick={() => setGrid(12)}
                         src="/images/gr.svg"
                         className="d-block img-fluid"
                         alt="grid"
@@ -107,10 +106,12 @@ const OurStore = () => {
 
               <div className="products_list pb-5">
                 <div className="row">
-                  <ProductCard grid={grid} />
-                  <ProductCard grid={grid} />
-                  <ProductCard grid={grid} />
-                  <ProductCard grid={grid} />
+                  {products &&
+                    products?.map((item, index) => {
+                      return (
+                        <ProductCard key={index} data={item} grid={grid} />
+                      );
+                    })}
                 </div>
               </div>
             </div>

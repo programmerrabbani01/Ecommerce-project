@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import CustomInput from "../components/CustomInput/CustomInput.jsx";
 import MetaData from "../components/HelmetData/MetaData.jsx";
-import JoditEditor from "jodit-react";
+// import JoditEditor from "jodit-react";
 import { useFormik } from "formik";
 import { array, number, object, string } from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import { getAllProductCategoryData } from "../features/productCategory/pCategory
 import { getAllProductCategories } from "../features/productCategory/pCategoryApiSlice.js";
 import { getAllColorsData } from "../features/color/colorSlice.js";
 import { getAllColors } from "../features/color/colorApiSlice.js";
-import { Select } from "antd";
+import { Badge, Select } from "antd";
 import Dropzone from "react-dropzone";
 import { createProducts } from "../features/product/productApiSlice.js";
 import { getAllTagsData } from "../features/tag/tagSlice.js";
@@ -24,34 +24,44 @@ import {
 
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { getAllSizesData } from "../features/size/sizeSlice.js";
+import { getAllSize } from "../features/size/sizeApiSlice.js";
 
 let schema = object({
   title: string().required("Title Is Required"),
   desc: string().required("Description Is Required"),
-  price: number().required("price Is Required"),
+  // regularPrice: number().required("Regular Price Is Required"),
+  salePrice: number().required("Sale Price Is Required"),
   quantity: number().required("Quantity Is Required"),
   brand: string().required("Brand Is Required"),
-  categories: string().required("Category Is Required"),
+  category: array()
+    .min(1, "Pick at least one category")
+    .required("Category Is Required"),
   collectionName: string().required("CollectionName Is Required"),
   color: array()
     .min(1, "Pick at least one color")
     .required("Color Is Required"),
   tag: array().min(1, "Pick at least one tag").required("Tag Is Required"),
+  size: array().min(1, "Pick at least one size").required("Size Is Required"),
 });
 
 const AddProduct = () => {
-  const title = "Add Product - Digitic";
+  const title = "Add Product - FLASHMART";
 
   // const editor = useRef(null);
   const dispatch = useDispatch();
   const [color, setColor] = useState([]);
   const [tag, setTag] = useState([]);
+  const [size, setSize] = useState([]);
+  const [category, setCategory] = useState([]);
   const [productLogo, setProductLogo] = useState([]);
 
   const { brands } = useSelector(getAllBrandsData);
-  const { productCategories } = useSelector(getAllProductCategoryData);
+  // const { productCategories } = useSelector(getAllProductCategoryData);
   const { colors } = useSelector(getAllColorsData);
   const { tags } = useSelector(getAllTagsData);
+  const { sizes } = useSelector(getAllSizesData);
+  const { productCategories } = useSelector(getAllProductCategoryData);
 
   const { error, message, loader } = useSelector(getAllProductsData);
 
@@ -61,12 +71,14 @@ const AddProduct = () => {
     initialValues: {
       title: "",
       desc: "",
-      price: "",
+      regularPrice: "",
+      salePrice: "",
       brand: "",
-      categories: "",
-      collectionName: "",
+      category: [],
+      collectionName: null,
       color: [],
       tag: [],
+      size: [],
       quantity: "",
       productLogo: [],
     },
@@ -76,12 +88,14 @@ const AddProduct = () => {
 
       form_data.append("title", values.title);
       form_data.append("desc", values.desc);
-      form_data.append("price", values.price);
+      form_data.append("regularPrice", values.regularPrice);
+      form_data.append("salePrice", values.salePrice);
       form_data.append("brand", values.brand);
-      form_data.append("categories", values.categories);
+      form_data.append("categories", JSON.stringify(values.category));
       form_data.append("collectionName", values.collectionName);
       form_data.append("colors", JSON.stringify(values.color));
       form_data.append("tags", JSON.stringify(values.tag));
+      form_data.append("size", JSON.stringify(values.size));
       form_data.append("quantity", values.quantity);
 
       values.productLogo.forEach((logo) => {
@@ -95,6 +109,8 @@ const AddProduct = () => {
       setProductLogo([]);
       setColor([]);
       setTag([]);
+      setSize([]);
+      setCategory([]);
     },
   });
 
@@ -124,7 +140,9 @@ const AddProduct = () => {
 
   colors?.forEach((i) => {
     getColor.push({
-      label: i.name,
+      label: <>
+      <Badge text={i?.name} color={`${i?.colorCode}`} />
+      </>,
       value: i._id,
     });
   });
@@ -142,10 +160,36 @@ const AddProduct = () => {
     value: i._id,
   }));
 
-  // handle Colors
+  // handle Tags
 
   const handleTags = (selectedTags) => {
     setTag(selectedTags);
+  };
+
+  //  size
+
+  const getSize = sizes?.map((i) => ({
+    label: i.name,
+    value: i._id,
+  }));
+
+  // handle size
+
+  const handleSizes = (selectedSizes) => {
+    setSize(selectedSizes);
+  };
+
+  //  size
+
+  const getCategory = productCategories?.map((i) => ({
+    label: i.name,
+    value: i._id,
+  }));
+
+  // handle size
+
+  const handleCategories = (selectedCategory) => {
+    setCategory(selectedCategory);
   };
 
   // get all brand , productCategories and colors
@@ -155,13 +199,17 @@ const AddProduct = () => {
     dispatch(getAllProductCategories());
     dispatch(getAllColors());
     dispatch(getAllTag());
+    dispatch(getAllSize());
+    dispatch(getAllProductCategories());
   }, [dispatch]);
 
   useEffect(() => {
-    formik.values.color = color ? color : " ";
-    formik.values.tag = tag ? tag : " ";
+    formik.values.color = color;
+    formik.values.tag = tag;
+    formik.values.size = size;
+    formik.values.category = category;
     formik.values.productLogo = productLogo;
-  }, [color, productLogo, tag]);
+  }, [color, productLogo, tag, size, category]);
 
   useEffect(() => {
     if (error) {
@@ -220,19 +268,35 @@ const AddProduct = () => {
               value={formik.values.desc}
             />
           </div>
+
+          {/* <div className="error">
+            {formik.touched.regularPrice && formik.errors.regularPrice ? (
+              <div>{formik.errors.regularPrice}</div>
+            ) : null}
+          </div> */}
+          <CustomInput
+            type="number"
+            label="Enter Product Regular Price"
+            name="regularPrice"
+            onChange={formik.handleChange("regularPrice")}
+            onBlur={formik.handleBlur("regularPrice")}
+            value={formik.values.regularPrice}
+          />
+
           <div className="error">
-            {formik.touched.price && formik.errors.price ? (
-              <div>{formik.errors.price}</div>
+            {formik.touched.salePrice && formik.errors.salePrice ? (
+              <div>{formik.errors.salePrice}</div>
             ) : null}
           </div>
           <CustomInput
             type="number"
-            label="Enter Product price"
-            name="price"
-            onChange={formik.handleChange("price")}
-            onBlur={formik.handleBlur("price")}
-            value={formik.values.price}
+            label="Enter Product Sale Price"
+            name="salePrice"
+            onChange={formik.handleChange("salePrice")}
+            onBlur={formik.handleBlur("salePrice")}
+            value={formik.values.salePrice}
           />
+
           <div className="error">
             {formik.touched.brand && formik.errors.brand ? (
               <div>{formik.errors.brand}</div>
@@ -254,27 +318,23 @@ const AddProduct = () => {
               );
             })}
           </select>
+
           <div className="error">
             {formik.touched.categories && formik.errors.categories ? (
               <div>{formik.errors.categories}</div>
             ) : null}
           </div>
-          <select
-            name="categories"
-            onChange={formik.handleChange("categories")}
-            onBlur={formik.handleBlur("categories")}
-            value={formik.values.categories}
-            className="form-control mb-4 py-3"
-          >
-            <option value="">Select Category</option>
-            {productCategories?.map((category, index) => {
-              return (
-                <option key={index} value={category.name}>
-                  {category.name}
-                </option>
-              );
-            })}
-          </select>
+
+          <Select
+            mode="multiple"
+            allowClear
+            className="w-100 colorSelect"
+            placeholder="Select Categories"
+            value={category}
+            onChange={handleCategories}
+            options={getCategory}
+          />
+
           <div className="error">
             {formik.touched.color && formik.errors.color ? (
               <div>{formik.errors.color}</div>
@@ -306,7 +366,22 @@ const AddProduct = () => {
             onChange={handleTags}
             options={getTag}
           />
-          
+
+          <div className="error">
+            {formik.touched.size && formik.errors.size ? (
+              <div>{formik.errors.size}</div>
+            ) : null}
+          </div>
+
+          <Select
+            mode="multiple"
+            allowClear
+            className="w-100 colorSelect"
+            placeholder="Select Sizes"
+            value={size}
+            onChange={handleSizes}
+            options={getSize}
+          />
 
           <div className="error">
             {formik.touched.collectionName && formik.errors.collectionName ? (

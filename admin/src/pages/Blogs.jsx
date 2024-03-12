@@ -1,9 +1,13 @@
 import BreadCum from "../components/BreadCum.jsx";
 import MetaData from "../components/MetaData.jsx";
 import BlogCard from "../components/BlogCard.jsx";
+import { useSelector } from "react-redux";
+import BlogSideBar from "../components/BlogSideBar.jsx";
 
 const Blogs = () => {
-  const title = "Blogs - Digitic";
+  const title = "Blogs - FLASHMART";
+
+  const { blogs } = useSelector((state) => state.blog);
 
   return (
     <>
@@ -16,44 +20,22 @@ const Blogs = () => {
         <div className="container">
           <div className="row">
             <div className="col-lg-3 col-12 ">
-              <div className="filter_card mb-3">
-                <h3 className="filter_title">Shop by categories</h3>
-                <div>
-                  <ul className="ps-0">
-                    <li>
-                      <a href="">Watch</a>
-                    </li>
-                    <li>
-                      <a href="">Tv</a>
-                    </li>
-                    <li>
-                      <a href="">Camera</a>
-                    </li>
-                    <li>
-                      <a href="">Laptop</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              <BlogSideBar />
             </div>
 
             <div className="col-lg-9 col-12">
               <div className="row">
-                <div className="col-lg-6 col-md-6 col-12 mb-4">
-                  <BlogCard />
-                </div>
-                <div className="col-lg-6 col-md-6 col-12 mb-4">
-                  <BlogCard />
-                </div>
-                <div className="col-lg-6 col-md-6 col-12 mb-4">
-                  <BlogCard />
-                </div>
-                <div className="col-lg-6 col-md-6 col-12 mb-4">
-                  <BlogCard />
-                </div>
-                <div className="col-lg-6 col-md-6 col-12 mb-4">
-                  <BlogCard />
-                </div>
+                {blogs &&
+                  blogs?.map((item, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="col-lg-6 col-md-6 col-12 mb-4"
+                      >
+                        <BlogCard data={item} />
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>

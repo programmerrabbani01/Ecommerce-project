@@ -34,7 +34,7 @@ const columns = [
 ];
 
 const ColorList = () => {
-  const title = "Color List - Digitic";
+  const title = "Color List - FLASHMART";
 
   const dispatch = useDispatch();
 
@@ -53,7 +53,8 @@ const ColorList = () => {
       colorCode: (
         <>
           {color.colorCode && (
-            <Badge count={color.name} showZero color={`${color?.colorCode}`} />
+            // <Badge count={color.name} showZero color={`${color?.colorCode}`} />
+            <Badge text={color.name} showZero color={`${color?.colorCode}`} />
           )}
         </>
       ),

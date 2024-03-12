@@ -101,7 +101,7 @@ export const getSingleBlog = asyncHandler(async (req, res) => {
 
     // return blog data
 
-    res.status(200).json(blogData);
+    res.status(200).json({ blog: blogData });
   } catch (error) {
     res.status(400).json({ message: "Blog not found" });
   }
@@ -147,49 +147,103 @@ export const deleteBlog = asyncHandler(async (req, res) => {
  * @access PUBLIC
  */
 
-export const updateBlog = asyncHandler(async (req, res) => {
-  // get id from prams
+// export const updateBlog = asyncHandler(async (req, res) => {
+//   // get id from params
+//   const { id } = req.params;
 
+//   // get data from body
+//   const { title, description, category, author } = req.body;
+
+//   // validation
+//   if (!title) {
+//     throw new Error("Blog title is required");
+//   }
+
+//   // check if blog exists
+//   const blog = await Blog.findById(id).exec();
+//   if (!blog) {
+//     throw new Error("Blog not found");
+//   }
+
+//   // update photo if provided
+//   let updatePhoto = blog.image;
+//   if (req.file) {
+//     const logo = await cloudUpload(req);
+//     updatePhoto = logo?.secure_url;
+
+//     // delete previous image if exists
+//     if (blog.image) {
+//       await cloudDelete(findPublicId(blog.image));
+//     }
+//   }
+
+//   // update blog data
+//   blog.title = title;
+//   blog.slug = createSlug(title);
+//   blog.image = updatePhoto || "";
+//   blog.description = description;
+//   blog.category = category;
+//   await blog.save();
+
+//   // response
+//   res.status(200).json({
+//     message: `Blog updated successfully`,
+//     blog: blog,
+//   });
+// });
+
+export const updateBlog = asyncHandler(async (req, res) => {
+  // get id from params
   const { id } = req.params;
 
   // get data from body
-
   const { title, description, category, author } = req.body;
 
   // validation
+  if (!title) {
+    throw new Error("Blog title is required");
+  }
 
-  if (!title) throw new Error("Blog title Is required");
-
-  // is available blog data
-
+  // check if blog exists
   const blog = await Blog.findById(id).exec();
+  if (!blog) {
+    throw new Error("Blog not found");
+  }
 
-  // is not available a blog data
-
-  if (!blog) throw new Error("Blog not found");
-
-  // logo upload
-
-  let updatePhoto = blog.image;
-
+  // update photo if provided
+  let updatePhoto = ""; // Initialize as empty string
   if (req.file) {
     const logo = await cloudUpload(req);
     updatePhoto = logo?.secure_url;
 
-    await cloudDelete(findPublicId(blog.image));
+    // delete previous image if exists
+    if (blog.image) {
+      await cloudDelete(findPublicId(blog.image));
+    }
+  } else {
+    // If no new photo provided, check if the photo should be removed
+    if (req.body.removePhoto === "true") {
+      // Delete previous image if exists
+      if (blog.image) {
+        await cloudDelete(findPublicId(blog.image));
+      }
+    } else {
+      // Keep the existing photo
+      updatePhoto = blog.image;
+    }
   }
 
-  // update blog
-
+  // update blog data
   blog.title = title;
   blog.slug = createSlug(title);
   blog.image = updatePhoto;
-  blog.save();
+  blog.category = category;
+  blog.description = description;
+  await blog.save();
 
-  // response blog update
-
+  // response
   res.status(200).json({
-    message: `Blog updated successful`,
+    message: `Blog updated successfully`,
     blog: blog,
   });
 });

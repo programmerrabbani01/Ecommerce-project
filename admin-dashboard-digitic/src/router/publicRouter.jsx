@@ -21,6 +21,10 @@ const publicRouter = [
         path: "/resetPassword",
         element: <ResetPassword />,
       },
+      {
+        path: "/resetPassword/:token",
+        element: <ResetPassword />,
+      },
     ],
   },
 ];

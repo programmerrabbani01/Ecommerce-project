@@ -42,7 +42,7 @@ const columns = [
 ];
 
 const BlogList = () => {
-  const title = "Blog List - Digitic";
+  const title = "Blog List - FLASHMART";
 
   const dispatch = useDispatch();
 
@@ -60,7 +60,7 @@ const BlogList = () => {
         key: i + 1,
         title: blogs[i].title,
         category: blogs[i].category,
-        date: blogs[i].createdAt,
+        date: new Date(blogs[i].createdAt).toLocaleString(),
         image: (
           <>
             {blogs[i]?.image && (

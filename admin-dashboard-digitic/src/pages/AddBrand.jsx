@@ -20,7 +20,7 @@ let schema = object({
 });
 
 const AddBrand = () => {
-  const title = "Add Brand - Digitic";
+  const title = "Add Brand - FLASHMART";
 
   const dispatch = useDispatch();
 

@@ -1,8 +1,11 @@
 import { Link, NavLink } from "react-router-dom";
 import SearchBar from "./SearchBar.jsx";
 import { FaBars } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import { getUserAuthData } from "../features/user/userSlice.js";
 
 const Header = () => {
+  const { user } = useSelector(getUserAuthData);
   return (
     <>
       <header className="header_first py-3">
@@ -72,15 +75,25 @@ const Header = () => {
                   </Link>
                 </div>
                 <div>
-                  <Link
-                    to="/login"
-                    className="d-flex align-items-center gap-10 text-white"
-                  >
-                    <img src="images/user.svg" alt="user" />
-                    <p className="mb-0">
-                      Log in <br /> my account
-                    </p>
-                  </Link>
+                  {user ? (
+                    <Link
+                      to="/profile"
+                      className="d-flex align-items-center gap-10 text-white"
+                    >
+                      <img src="images/user.svg" alt="user" />
+                      <p className="mb-0">Profile</p>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="d-flex align-items-center gap-10 text-white"
+                    >
+                      <img src="images/user.svg" alt="user" />
+                      <p className="mb-0">
+                        Log in <br /> my account
+                      </p>
+                    </Link>
+                  )}
                 </div>
                 <div>
                   <Link

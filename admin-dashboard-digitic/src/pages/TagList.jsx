@@ -27,7 +27,7 @@ const columns = [
 ];
 
 const TagList = () => {
-  const title = "Tag List - Digitic";
+  const title = "Tag List - FLASHMART";
 
   const dispatch = useDispatch();
 

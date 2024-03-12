@@ -13,7 +13,7 @@ let schema = object({
 });
 
 const AddTag = () => {
-  const title = "Add Tag - Digitic";
+  const title = "Add Tag - FLASHMART";
 
   const dispatch = useDispatch();
 

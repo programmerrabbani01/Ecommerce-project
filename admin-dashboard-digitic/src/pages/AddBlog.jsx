@@ -23,7 +23,7 @@ let schema = object({
 });
 
 const AddBlog = () => {
-  const title = "Add Blog - Digitic";
+  const title = "Add Blog - FLASHMART";
 
   const editor = useRef(null);
 

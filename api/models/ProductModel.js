@@ -18,16 +18,20 @@ const productSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
-    price: {
+    regularPrice: {
+      type: Number,
+      trim: true,
+      default: 0,
+    },
+    salePrice: {
       type: Number,
       required: true,
       trim: true,
       default: 0,
     },
     categories: {
-      type: String,
-      required: true,
-      trim: true,
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "ProductCategory",
     },
     collectionName: {
       type: String,
@@ -49,10 +53,10 @@ const productSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
-    photos: {
-      type: Array,
-      trim: true,
-      default: [],
+    photos: [{ public_id: String, url: String }],
+    size: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Size",
     },
     colors: {
       type: [mongoose.Schema.Types.ObjectId],

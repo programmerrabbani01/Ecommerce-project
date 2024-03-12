@@ -34,7 +34,7 @@ const columns = [
 ];
 
 const BrandList = () => {
-  const title = "Brand List - Digitic";
+  const title = "Brand List - FLASHMART";
 
   const dispatch = useDispatch();
 

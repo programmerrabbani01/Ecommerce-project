@@ -13,7 +13,7 @@ export const forgetPasswordEmail = ({ to, name, token }) => {
     },
   });
   transporter.sendMail({
-    from: `Digitic <${EMAIL_USER}>`, // sender address
+    from: `FLASHMART <${EMAIL_USER}>`, // sender address
     to: to, // list of receivers
     subject: "Forget Password", // Subject line
     html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f0f0f0;">
@@ -24,7 +24,7 @@ export const forgetPasswordEmail = ({ to, name, token }) => {
       </td>
     </tr>
     <tr>
-      <td bgcolor="#ffffff" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <td background-color="#ffffff" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
         <h1 style="color: #007BFF; margin-bottom: 20px;">Forget Password</h1>
         <p style="font-size: 16px; line-height: 1.6; color: #444;">Hello ${name},</p>
         <p style="font-size: 16px; line-height: 1.6; color: #444;">please check below Forget Password button</p>
@@ -33,7 +33,7 @@ export const forgetPasswordEmail = ({ to, name, token }) => {
         <a href="${token}" target="_blank" style="display: inline-block; background-color: #007BFF; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-top: 20px;">${token}</a>
         <p style="font-size: 16px; line-height: 1.6; color: #444;">If you didn't request this verification, you can safely ignore this email.</p>
         <div style="margin-top: 40px; color: #666; font-size: 14px;">
-          <p>Wolmart</p>
+          <p>FLASHMART</p>
         </div>
       </td>
     </tr>

@@ -1,12 +1,12 @@
 import express from "express";
 import {
-  addToWishlist,
   createProduct,
   deleteProduct,
   getAllProduct,
   getSingleProduct,
   ratingProduct,
   updateProduct,
+  updateProductImageDelete,
   updateProductStatus,
 } from "../controllers/productController.js";
 import { isAdmin, tokenVerify } from "../middlewares/tokenVerify.js";
@@ -19,6 +19,7 @@ const router = express.Router();
 router.use(tokenVerify);
 
 //routing
+
 router
   .route("/")
   .get(getAllProduct)
@@ -27,10 +28,13 @@ router
   .route("/:id")
   .get(getSingleProduct)
   .delete(isAdmin, productMulter, deleteProduct)
-  .patch(isAdmin, productMulter, updateProduct);
+  .put(isAdmin, productMulter, updateProduct);
+
 router.route("/status/:id").patch(isAdmin, updateProductStatus);
-router.route("/wishlist").put(addToWishlist);
+
 router.route("/rating").put(ratingProduct);
+
+router.route("/photos/:id").put(isAdmin, updateProductImageDelete);
 
 //export
 export default router;

@@ -1,13 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import BreadCum from "../components/BreadCum.jsx";
 import MetaData from "../components/MetaData.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { getBlogData } from "../features/blogs/blogSlice.js";
+import { useEffect } from "react";
+import { getSIngleBlog } from "../features/blogs/blogApiSlice.js";
 
 const SingleBlog = () => {
-  const title = "DynamicBlogName - Digitic";
+  const title = "DynamicBlogName - FLASHMART";
+
+  const dispatch = useDispatch();
+  const { singleBlog, loader } = useSelector(getBlogData);
+  //get the brand id
+  const { id } = useParams();
+
+  //get single blog
+  useEffect(() => {
+    dispatch(getSIngleBlog(id));
+  }, [dispatch, id]);
+
   return (
     <>
       <MetaData title={title} />
-      <BreadCum title="DynamicBlogName" />
+      <BreadCum title={singleBlog?.title} />
 
       {/* SingleBlog Start */}
 
@@ -35,24 +50,13 @@ const SingleBlog = () => {
                   </svg>
                   Back to blog
                 </Link>
-                <h3 className="title">
-                  A Beautiful Sunday Morning Renaissance
-                </h3>
+                <h3 className="title">{singleBlog?.title}</h3>
                 <img
-                  src="/images/blog-1.jpg "
+                  src={singleBlog?.image}
                   alt=""
                   className="img-fluid w-100 my-4"
                 />
-                <p className="singlePra">
-                  You’re only as good as your last collection, which is an
-                  enormous pressure. I think there is something about luxury –
-                  it’s not something people need, but it’s what they want. It
-                  really pulls at their heart. I have a fantastic relationship
-                  with money.Scelerisque sociosqu ullamcorper urna nisl mollis
-                  vestibulum pretium commodo inceptos cum condimentum placerat
-                  diam venenatis blandit hac eget dis lacus a parturient a
-                  accumsan nisl ante vestibulum.
-                </p>
+                <p className="singlePra">{singleBlog?.description}</p>
               </div>
             </div>
           </div>

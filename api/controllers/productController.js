@@ -63,7 +63,11 @@ export const getAllProduct = asyncHandler(async (req, res) => {
 
   // get all product
 
-  const products = await query.populate("colors").populate("tags");
+  const products = await query
+    .populate("colors")
+    .populate("tags")
+    .populate("size")
+    .populate("categories");
 
   // validation
 
@@ -85,27 +89,19 @@ export const createProduct = asyncHandler(async (req, res) => {
   const {
     title,
     desc,
-    price,
+    regularPrice,
+    salePrice,
     brand,
     quantity,
     categories,
     colors,
     tags,
     collectionName,
+    size,
   } = req.body;
 
   // check validation
-  if (
-    !title ||
-    !desc ||
-    !price ||
-    !brand ||
-    !quantity ||
-    !categories ||
-    !colors ||
-    !tags ||
-    !collectionName
-  ) {
+  if (!title || !salePrice || !quantity) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -123,35 +119,47 @@ export const createProduct = asyncHandler(async (req, res) => {
   if (req.files) {
     for (let i = 0; i < req.files.length; i++) {
       const fileData = await cloudUploads(req.files[i].path);
-      photos.push(fileData);
+
+      photos.push({
+        url: fileData.url,
+        public_id: fileData.public_id,
+      });
     }
   }
 
   // Parse colors and tags from string representations
   const cleanedColorsString = colors.replace(/'/g, '"');
   const cleanedTagsString = tags.replace(/'/g, '"');
+  const cleanedSizeString = size.replace(/'/g, '"');
+  const cleanedCategoryString = categories.replace(/'/g, '"');
   const colorsArray = JSON.parse(cleanedColorsString);
   const tagsArray = JSON.parse(cleanedTagsString);
+  const sizeArray = JSON.parse(cleanedSizeString);
+  const categoryArray = JSON.parse(cleanedCategoryString);
 
   // create new  product
   const product = await Product.create({
     title,
     slug: slugify(title),
     desc,
-    price,
+    regularPrice,
+    salePrice,
     brand,
     quantity,
-    categories,
+    categories: categoryArray,
     collectionName,
     colors: colorsArray,
     tags: tagsArray,
     photos: photos.length > 0 ? photos : null,
+    size: sizeArray,
   });
 
   // confirm create product
   const findProduct = await Product.findById(product.id)
     .populate("colors")
-    .populate("tags");
+    .populate("tags")
+    .populate("size")
+    .populate("categories");
 
   // check
   if (product) {
@@ -172,13 +180,16 @@ export const createProduct = asyncHandler(async (req, res) => {
 export const getSingleProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const product = await Product.findById(id);
-
-  if (!product) {
-    return res.status(400).json({ message: "No product found" });
+  try {
+    const product = await Product.findById(id)
+      .populate("colors")
+      .populate("tags")
+      .populate("size")
+      .populate("categories");
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(400).json({ message: "product not found" });
   }
-
-  res.json(product);
 });
 
 /**
@@ -190,24 +201,27 @@ export const getSingleProduct = asyncHandler(async (req, res) => {
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const { name, desc, price, brand, quantity, categories, colors, tags } =
-    req.body;
+  const {
+    title,
+    desc,
+    salePrice,
+    regularPrice,
+    brand,
+    quantity,
+    categories,
+    collectionName,
+    colors,
+    tags,
+    size,
+  } = req.body;
 
   // validation
 
-  if (
-    !name ||
-    !desc ||
-    !price ||
-    !brand ||
-    !quantity ||
-    !categories ||
-    !colors ||
-    !tags
-  ) {
+  if (!title || !salePrice || !quantity) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
+  // find product by id
   const product = await Product.findById(id);
 
   if (!product) {
@@ -216,37 +230,102 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   // Logo upload
 
-  let updatePhotos = product.photos;
+  // Update photos only if new photos are provided
+  let updatePhotos = [...product.photos];
 
-  console.log(updatePhotos); // Clone the existing photos array
+  if (req.files && req.files?.length >= 0) {
+    // If new photos are provided, upload them and update the photo array
 
-  if (req.files && req.files.length > 0) {
-    for (let i = 0; i < req.files.length; i++) {
+    for (let i = 0; i < req.files?.length; i++) {
       const fileData = await cloudUploads(req.files[i].path);
-      updatePhotos = fileData;
-
-      // Delete the old cloud image using its public ID
-
-      await cloudDelete(findPublicId(product.photos[i]));
+      updatePhotos.push({
+        url: fileData.url,
+        public_id: fileData.public_id,
+      });
     }
   }
 
+  // Parse categories from string representation
+  const cleanedCategoryString = categories.replace(/'/g, '"');
+  const categoryArray = JSON.parse(cleanedCategoryString);
+  const cleanedColorString = colors.replace(/'/g, '"');
+  const colorArray = JSON.parse(cleanedColorString);
+  const cleanedTagString = tags.replace(/'/g, '"');
+  const tagArray = JSON.parse(cleanedTagString);
+  const cleanedSizeString = size.replace(/'/g, '"');
+  const sizeArray = JSON.parse(cleanedSizeString);
+
   // update product data
 
-  product.name = name;
-  product.slug = slugify(name);
-  product.photos = updatePhotos;
-  product.desc = desc;
-  product.price = price;
-  product.brand = brand;
-  product.quantity = quantity;
-  product.categories = categories;
-  product.colors = colors;
-  product.tags = tags;
+  const updateProduct = await Product.findByIdAndUpdate(
+    id,
+    {
+      title,
+      slug: slugify(title),
+      salePrice,
+      regularPrice,
+      desc,
+      quantity,
+      collectionName,
+      colors: colorArray || [],
+      size: sizeArray || [],
+      categories: categoryArray || [],
+      brand: brand || null,
+      tags: tagArray || [],
+      photos: updatePhotos || [],
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("brand")
+    .populate("categories")
+    .populate("colors")
+    .populate("tags")
+    .populate("size");
 
-  product.save();
+  res.json({ message: `Product updated successful`, product: updateProduct });
+});
 
-  res.json({ message: `Product updated successful`, product: product });
+/**
+ * @DESC update a Product delete
+ * @ROUTE /api/v1/product/:id
+ * @METHOD PATCH
+ * @ACCESS protected
+ */
+export const updateProductImageDelete = asyncHandler(async (req, res) => {
+  try {
+    // get params id
+    const { id } = req.params;
+    // get body data
+    const { imageId } = req.body;
+    const pd = await Product.findById(id);
+
+    if (imageId) {
+      await cloudDelete(imageId);
+    }
+    // Find product by id
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        photos: pd?.photos?.filter((img) => {
+          return img.public_id !== imageId;
+        }),
+      },
+      { new: true }
+    );
+
+    //if does not available product
+    if (!product) {
+      throw new Error("Product Image Not Found!");
+    }
+
+    res
+      .status(200)
+      .json({ imageId: imageId, message: "Image Delete successfully" });
+  } catch (error) {
+    throw new Error("something went wrong");
+  }
 });
 
 /**
@@ -267,11 +346,17 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   // remove photo from cloudinary
 
   // Check if 'product.photos' exists before attempting to delete photos
-  if (product.photos && product.photos.length > 0) {
-    const publicIds = product.photos.map((photo) => findPublicId(photo));
+  // if (product.photos && product.photos.length > 0) {
+  //   const publicIds = product.photos.map((photo) => findPublicId(photo));
 
-    // Assuming 'cloudDelete' can delete multiple photos
-    await Promise.all(publicIds.map((publicId) => cloudDelete(publicId)));
+  //   // Assuming 'cloudDelete' can delete multiple photos
+  //   await Promise.all(publicIds.map((publicId) => cloudDelete(publicId)));
+  // }
+
+  if (product?.photos?.length >= 0) {
+    for (const file of product?.photos) {
+      await cloudDelete(file.public_id);
+    }
   }
 
   res.status(200).json({ message: "Product Delete Successful", product });
@@ -302,77 +387,6 @@ export const updateProductStatus = asyncHandler(async (req, res) => {
     message: `Product Status Updated Successful`,
     product: updateProductStatus,
   });
-});
-
-/**
- * @desc add to wishlist
- * @route PUT /api/v1/product/wishlist
- * @access public
- */
-
-export const addToWishlist = asyncHandler(async (req, res) => {
-  // get product id from body
-
-  const { productId } = req.body;
-
-  // product id is required validation
-
-  if (!productId) throw new Error("Product ID Must Be Provided");
-
-  // find login user
-
-  const { email } = req.me;
-
-  const user = await User.findOne({ email });
-
-  // user not valid
-
-  if (!user) throw new Error("Invalid User");
-
-  // already added a product to Wishlist
-
-  const alreadyAdded = await user.wishList.find(
-    (el) => el.toString() === productId
-  );
-
-  // already added a product to wishlist
-
-  if (alreadyAdded) {
-    const removeWishlist = await User.findByIdAndUpdate(
-      user._id,
-      {
-        $pull: {
-          wishList: productId,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-
-    // remove  a product from the wishlist response
-
-    return res
-      .status(200)
-      .json({ wishList: removeWishlist, message: "Remove wishlist Item" });
-  } else {
-    const addWishlist = await User.findByIdAndUpdate(
-      user._id,
-      {
-        $push: {
-          wishList: productId,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-
-    return res.status(200).json({
-      wishList: addWishlist,
-      message: "added to the Wishlist is successful",
-    });
-  }
 });
 
 /**

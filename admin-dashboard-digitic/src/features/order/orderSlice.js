@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllOrders } from "./orderApiSlice.js";
-
-// create auth slice
+import { getAllOrders, getAllUserOrdersById } from "./orderApiSlice.js";
 
 const orderSlice = createSlice({
   name: "order",
@@ -16,6 +14,9 @@ const orderSlice = createSlice({
       state.message = null;
       state.error = null;
     },
+    setOrders: (state, action) => {
+      state.orders = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -29,18 +30,23 @@ const orderSlice = createSlice({
       .addCase(getAllOrders.fulfilled, (state, action) => {
         state.orders = action.payload;
         state.loader = false;
+      })
+      .addCase(getAllUserOrdersById.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(getAllUserOrdersById.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loader = false;
+      })
+      .addCase(getAllUserOrdersById.fulfilled, (state, action) => {
+        state.orders = action.payload.userOrder;
+        state.loader = false;
       });
   },
 });
 
-// export selectors
-
 export const getAllOrdersData = (state) => state.order;
 
-// export actions
-
-export const { setMessageEmpty } = orderSlice.actions;
-
-// export default
+export const { setMessageEmpty, setOrders } = orderSlice.actions;
 
 export default orderSlice.reducer;

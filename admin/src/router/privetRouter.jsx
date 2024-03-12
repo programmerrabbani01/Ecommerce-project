@@ -9,6 +9,7 @@ import Contact from "../pages/Contact.jsx";
 import Home from "../pages/Home.jsx";
 import OurStore from "../pages/OurStore.jsx";
 import PrivacyPolicy from "../pages/PrivacyPolicy.jsx";
+import Profile from "../pages/Profile.jsx";
 import RefundPolicy from "../pages/RefundPolicy.jsx";
 import ShippingPolicy from "../pages/ShippingPolicy.jsx";
 import SingleBlog from "../pages/SingleBlog.jsx";
@@ -75,6 +76,10 @@ const privetRouter = [
       {
         path: "/checkOut",
         element: <CheckOut />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
       },
     ],
   },

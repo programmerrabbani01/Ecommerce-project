@@ -36,24 +36,32 @@ const columns = [
     dataIndex: "brand",
     sorter: (a, b) => a.brand.length - b.brand.length,
   },
+  // {
+  //   title: "Category",
+  //   dataIndex: "categories",
+  //   sorter: (a, b) => a.categories.length - b.categories.length,
+  // },
+  // {
+  //   title: "Tag",
+  //   dataIndex: "tags",
+  // },
+  // {
+  //   title: "Color",
+  //   dataIndex: "colors",
+  // },
   {
-    title: "Category",
-    dataIndex: "categories",
-    sorter: (a, b) => a.categories.length - b.categories.length,
+    title: "Regular Price",
+    dataIndex: "regularPrice",
   },
   {
-    title: "Tag",
-    dataIndex: "tags",
+    title: "Sale Price",
+    dataIndex: "salePrice",
   },
-  {
-    title: "Color",
-    dataIndex: "colors",
-  },
-  {
-    title: "Price",
-    dataIndex: "price",
-    sorter: (a, b) => a.price - b.price,
-  },
+  // {
+  //   title: "Size",
+  //   dataIndex: "size",
+  // },
+
   {
     title: "Quantity",
     dataIndex: "quantity",
@@ -65,7 +73,7 @@ const columns = [
 ];
 
 const Products = () => {
-  const title = "Products - Digitic";
+  const title = "Products - FLASHMART";
 
   const dispatch = useDispatch();
 
@@ -108,46 +116,61 @@ const Products = () => {
       photos: (
         <>
           {Array.isArray(product?.photos) && product?.photos[0] && (
-            <img className="productImage" src={product?.photos[0]} alt="" />
+            <img className="productImage" src={product?.photos[0].url} alt="" />
           )}
         </>
       ),
 
       brand: product?.brand,
       categories: product?.categories,
-      tags: (
-        <>
-          {product?.tags?.map((item, index) => {
-            return (
-              <ul
-                key={index}
-                style={{ listStyle: "none", margin: "0px", padding: "0px" }}
-              >
-                <li>{item?.name}</li>
-              </ul>
-            );
-          })}
-        </>
-      ),
-      colors: (
-        <>
-          {product?.colors?.map((item, index) => {
-            return (
-              <ul
-                key={index}
-                style={{ listStyle: "none", margin: "0px", padding: "0px" }}
-              >
-                <li>{item?.name}</li>
-              </ul>
-            );
-          })}
-        </>
-      ),
-      price: `${product?.price}`,
+      // tags: (
+      //   <>
+      //     {product?.tags?.map((item, index) => {
+      //       return (
+      //         <ul
+      //           key={index}
+      //           style={{ listStyle: "none", margin: "0px", padding: "0px" }}
+      //         >
+      //           <li>{item?.name}</li>
+      //         </ul>
+      //       );
+      //     })}
+      //   </>
+      // ),
+      // colors: (
+      //   <>
+      //     {product?.colors?.map((item, index) => {
+      //       return (
+      //         <ul
+      //           key={index}
+      //           style={{ listStyle: "none", margin: "0px", padding: "0px" }}
+      //         >
+      //           <li>{item?.name}</li>
+      //         </ul>
+      //       );
+      //     })}
+      //   </>
+      // ),
+      regularPrice: `${product?.regularPrice}`,
+      salePrice: `${product?.salePrice}`,
+      // size: (
+      //   <>
+      //     {product?.size?.map((item, index) => {
+      //       return (
+      //         <ul
+      //           key={index}
+      //           style={{ listStyle: "none", margin: "0px", padding: "0px" }}
+      //         >
+      //           <li>{item?.name}</li>
+      //         </ul>
+      //       );
+      //     })}
+      //   </>
+      // ),
       quantity: `${product?.quantity}`,
       action: (
         <>
-          <Link to="" className=" fs-5 text-danger">
+          <Link to={`/products/${product?._id}`} className=" fs-5 text-danger">
             <FaEdit />
           </Link>
           <Link

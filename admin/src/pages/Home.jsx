@@ -5,9 +5,15 @@ import ProductCard from "../components/ProductCard.jsx";
 import SpecialProduct from "../components/SpecialProduct.jsx";
 import MetaData from "../components/MetaData.jsx";
 import { services } from "../utils/Data.js";
+import { getBlogData } from "../features/blogs/blogSlice.js";
+import { useSelector } from "react-redux";
 
 const Home = () => {
-  const title = "Home - Digitic";
+  const title = "Home - FLASHMART";
+
+  const { products } = useSelector((state) => state.product);
+
+  const { blogs } = useSelector(getBlogData);
 
   return (
     <>
@@ -218,10 +224,11 @@ const Home = () => {
             <div className="col-12">
               <h3 className="sectionHeading">Featured Collection</h3>
             </div>
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+
+            {products &&
+              products?.map((item, index) => {
+                return <ProductCard key={index} data={item} />;
+              })}
           </div>
         </div>
       </section>
@@ -321,10 +328,10 @@ const Home = () => {
             </div>
           </div>
           <div className="row">
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+            {products &&
+              products?.map((item, index) => {
+                return <ProductCard key={index} data={item} />;
+              })}
           </div>
         </div>
       </section>
@@ -375,18 +382,14 @@ const Home = () => {
           </div>
 
           <div className="row">
-            <div className="col-lg-3 col-md-6 col-12 mb-4">
-              <BlogCard />
-            </div>
-            <div className="col-lg-3 col-md-6 col-12 mb-4">
-              <BlogCard />
-            </div>
-            <div className="col-lg-3 col-md-6 col-12 mb-4">
-              <BlogCard />
-            </div>
-            <div className="col-lg-3 col-md-6 col-12 ">
-              <BlogCard />
-            </div>
+            {blogs &&
+              blogs?.map((item, index) => {
+                return (
+                  <div key={index} className="col-lg-3 col-md-6 col-12 mb-4">
+                    <BlogCard data={item} />
+                  </div>
+                );
+              })}
           </div>
         </div>
       </section>

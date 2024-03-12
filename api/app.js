@@ -16,6 +16,7 @@ import tagRoute from "./routes/tagRoute.js";
 import couponRoute from "./routes/couponRoute.js";
 import colorRoute from "./routes/colorRoute.js";
 import enqRoute from "./routes/enqRoute.js";
+import sizeRoute from "./routes/sizeRoute.js";
 // init express
 
 const app = express();
@@ -26,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     credentials: true,
   })
 );
@@ -49,6 +50,7 @@ app.use("/api/v1/tag", tagRoute);
 app.use("/api/v1/coupon", couponRoute);
 app.use("/api/v1/color", colorRoute);
 app.use("/api/v1/enq", enqRoute);
+app.use("/api/v1/size", sizeRoute);
 app.use("/api/v1/auth", authRoute);
 
 // error handlers

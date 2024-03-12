@@ -7,8 +7,11 @@ import { useEffect, useState } from "react";
 import { getAuthData, setMessageEmpty } from "../features/auth/authSlice.js";
 import { createToaster } from "../utils/toastify.js";
 import { adminLogin } from "../features/auth/authApiSlice.js";
+import MetaData from "../components/HelmetData/MetaData.jsx";
 
 const Login = () => {
+  const title = "LogIn - FLASHMART";
+
   const dispatch = useDispatch();
   const { error, message, user } = useSelector(getAuthData);
   const navigate = useNavigate();
@@ -66,6 +69,10 @@ const Login = () => {
 
   return (
     <>
+      <MetaData title={title} />
+
+      {/*  */}
+
       <div
         className="py-5"
         style={{ backgroundColor: "#d50101", minHeight: "100vh" }}

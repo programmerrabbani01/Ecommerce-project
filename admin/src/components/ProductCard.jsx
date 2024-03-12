@@ -1,10 +1,53 @@
 import ReactStars from "react-rating-stars-component";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
-const ProductCard = (props) => {
-  const { grid } = props;
+import { useEffect, useState } from "react";
+import { createToaster } from "../utils/toastify.js";
+import PropTypes from "prop-types";
+import {
+  getUserAuthData,
+  setMessageEmpty,
+} from "../features/user/userSlice.js";
+import { addWIshList } from "../features/user/userApiSlice.js";
 
+const ProductCard = ({ data = null, grid = 4 }) => {
   let location = useLocation();
+  const [isWishlist, setIsWishlist] = useState(false);
+  const dispatch = useDispatch();
+
+  const { wishlist, error, message } = useSelector(getUserAuthData);
+
+  //add wishlist item
+  const handleChangeWishList = (e, id) => {
+    e.preventDefault();
+    if (id) {
+      dispatch(addWIshList(id));
+    }
+  };
+  // Update useEffect to reflect changes in wishlist state
+  useEffect(() => {
+    // Check if the product is in the wishlist
+    if (wishlist) {
+      const isInWishlist = wishlist.some((item) => item?._id === data?._id);
+      setIsWishlist(isInWishlist);
+    }
+  }, [wishlist, data]);
+
+  // console.log(isWishlist);
+
+  // // messages
+
+  useEffect(() => {
+    if (error) {
+      createToaster(error);
+      dispatch(setMessageEmpty());
+    }
+    if (message) {
+      createToaster(message, "success");
+      dispatch(setMessageEmpty());
+    }
+  }, [dispatch, error, message]);
 
   return (
     <>
@@ -26,42 +69,54 @@ const ProductCard = (props) => {
           className="productCard position-relative"
         >
           <div className="wishListIcon position-absolute">
-            <Link>
-              <img src="/images/wish.svg" alt="" />
+            <Link
+              className="wishlistIcon"
+              to="#"
+              onClick={(e) => handleChangeWishList(e, data._id)}
+            >
+              {isWishlist ? (
+                <img width={18} src="/images/wish-black.svg" alt="" />
+              ) : (
+                <img src="/images/wish.svg" alt="" />
+              )}
             </Link>
           </div>
           <div className="productImage">
-            <img
-              src="/images/24_260x.avif"
-              alt="product image"
-              className="img-fluid"
-            />
-            <img
-              src="../../public/images/24-01_260x2.avif"
-              alt="product image"
-              className="img-fluid"
-            />
+            {data?.photos?.[0]?.url && (
+              <img
+                src={data.photos[0].url}
+                alt="product image"
+                className="img-fluid"
+              />
+            )}
+
+            {data?.photos?.[1]?.url && (
+              <img
+                src={data.photos[1].url}
+                alt="product image"
+                className="img-fluid"
+              />
+            )}
           </div>
           <div className="productDetails">
-            <h6 className="brand">Havells</h6>
-            <h5 className="productTitle">
-              Kids headphones bulk 10 pack multi colored for students
-            </h5>
+            <h6 className="brand">{data?.brand?.name}</h6>
+            <h5 className="productTitle">{data?.title}</h5>
             <ReactStars
               count={5}
               //   onChange={ratingChanged}
               size={24}
-              value={3}
+              value={data?.totalRating}
               edit={false}
               activeColor="#ffd700"
             />
-            <p className={`dsc ${grid === 12 ? "d-block" : "d-none"}`}>
-              At vero eos et accusamus et iusto odio dignissimos ducimus qui
-              blanditiis praesentium voluptatum deleniti atque corrupti quos
-              dolores et quas molestias excepturi sint occaecati cupiditate non
-              provident, similique sunt...
-            </p>
-            <p className="price">$100.00</p>
+            <p
+              className={`dsc ${grid === 12 ? "d-block" : "d-none"}`}
+              dangerouslySetInnerHTML={{ __html: data?.desc }}
+            ></p>
+            <div className="price">
+              <p className="regularPrice">$ {data?.regularPrice}</p>
+              <p className="salePrice">$ {data?.salePrice}</p>
+            </div>
           </div>
           <div className="actionBar position-absolute">
             <div className="d-flex flex-column gap-10">
@@ -80,6 +135,11 @@ const ProductCard = (props) => {
       </div>
     </>
   );
+};
+
+ProductCard.propTypes = {
+  data: PropTypes.object.isRequired, // You can specify the exact shape of the object if needed
+  grid: PropTypes.number.isRequired,
 };
 
 export default ProductCard;

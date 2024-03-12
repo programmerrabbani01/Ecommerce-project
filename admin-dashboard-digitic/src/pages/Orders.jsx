@@ -22,7 +22,7 @@ const columns = [
     dataIndex: "product",
   },
   {
-    title: "Amount",
+    title: "Total Amount",
     dataIndex: "amount",
   },
   {
@@ -36,7 +36,7 @@ const columns = [
 ];
 
 const Orders = () => {
-  const title = "Orders - Digitic";
+  const title = "Orders - FLASHMART";
 
   const dispatch = useDispatch();
 
@@ -50,21 +50,39 @@ const Orders = () => {
 
   if (orders !== null) {
     for (let i = 0; i < orders.length; i++) {
-      data1.push({
+      const date = new Date(orders[i]?.createdAt);
+      const formattedDate = `${
+        date.getMonth() + 1
+      }/${date.getDate()}/${date.getFullYear()}`;
+      const formattedTime = date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+       data1.push({
         key: i + 1,
         name: orders[i].orderBy.firstName + " " + orders[i].orderBy.lastName,
-        product: orders[i].products.map((i, index) => {
-          return (
-            <ul
-              style={{ listStyle: "none", margin: "0px", padding: "0px" }}
-              key={index}
-            >
-              <li>{i.product?.title}</li>
-            </ul>
-          );
-        }),
+        // product: orders[i].products.map((i, index) => {
+        //   return (
+        //     <ul
+        //       style={{ listStyle: "none", margin: "0px", padding: "0px" }}
+        //       key={index}
+        //     >
+        //       <li>{i.product?.title}</li>
+        //     </ul>
+        //   );
+        // }),
+        product: (
+          <Link to={`/orders/${orders[i].orderBy._id}`}>View Orders</Link>
+        ),
         amount: orders[i].paymentIntent.amount,
-        date: new Date(orders[i].createdAt).toLocaleString(),
+        // date: new Date(orders[i].createdAt).toLocaleString(),
+        date: (
+          <>
+            <div>{formattedDate}</div>
+            <div>{formattedTime}</div>
+          </>
+        ),
         action: (
           <>
             <Link to="" className=" fs-5 text-danger">

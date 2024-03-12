@@ -30,7 +30,7 @@ const columns = [
 ];
 
 const CategoryList = () => {
-  const title = "Category List - Digitic";
+  const title = "Category List - FLASHMART";
 
   const dispatch = useDispatch();
 

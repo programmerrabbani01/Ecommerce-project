@@ -34,7 +34,7 @@ const columns = [
 ];
 
 const BlogCategoryList = () => {
-  const title = "Blog Categories - Digitic";
+  const title = "Blog Categories - FLASHMART";
 
   const dispatch = useDispatch();
 

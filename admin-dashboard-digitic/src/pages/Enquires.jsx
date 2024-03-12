@@ -85,7 +85,7 @@ const Enquires = () => {
             </select>
           </>
         ),
-        date: enquires[i].createdAt,
+        date: new Date(enquires[i].createdAt).toLocaleString(),
         action: (
           <>
             <Link

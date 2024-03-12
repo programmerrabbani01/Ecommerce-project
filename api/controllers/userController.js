@@ -6,6 +6,9 @@ import Cart from "../models/CartModel.js";
 import Order from "../models/OrderModel.js";
 import bcrypt from "bcryptjs";
 import uniqid from "uniqid";
+import { cloudDelete, cloudUpload } from "../utils/cloudinary.js";
+import { forgetPasswordEmail } from "../utils/sendMail.js";
+import crypto from "crypto";
 
 /**
  * @desc get all users data
@@ -110,6 +113,11 @@ export const deleteUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User delete failed" });
   }
 
+  // delete cloud image
+  if (user?.photo?.public_id) {
+    await cloudDelete(user?.photo?.public_id);
+  }
+
   res.status(200).json({ message: "User Delete Successful", user });
 });
 
@@ -122,32 +130,61 @@ export const deleteUser = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const { firstName, lastName, email, password, mobile } = req.body;
+  const { firstName, lastName, email, address, mobile, gender } = req.body;
+
+  console.log(req.body);
 
   // validation
 
-  if (!firstName || !lastName || !email || !password) {
+  if (!firstName || !lastName) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  // hash password
-  const hash = await bcrypt.hash(password, 10);
+  //find user
+  const user = await User.findById(id);
+
+  console.log(user);
+  //if user not available
+  if (!user) {
+    return res.status(400).json("User Not Found");
+  }
+
+  //photo update
+  let userPhoto = null;
+  if (req.file) {
+    const userP = await cloudUpload(req);
+    userPhoto = {
+      url: userP.url,
+      public_id: userP.public_id,
+    };
+  }
+
+  //delete images
+  if (!userPhoto) {
+    userPhoto = user?.photo;
+  } else {
+    if (user?.photo?.public_id) {
+      await cloudDelete(user.photo?.public_id);
+    }
+  }
 
   // update user data
 
-  const user = await User.findByIdAndUpdate(
+  const updateUser = await User.findByIdAndUpdate(
     id,
     {
       firstName,
       lastName,
       email,
-      password: hash,
       mobile,
+      gender,
+      address,
+      photo: userPhoto ? userPhoto : null,
     },
     { new: true }
   );
 
-  res.json({ message: `User updated successful`, user: user });
+  res.json({ message: `User updated successful`, user: updateUser });
 });
 
 /**
@@ -175,6 +212,111 @@ export const updateUserStatus = asyncHandler(async (req, res) => {
     message: `User Status Updated Successful`,
     user: updateUserStatus,
   });
+});
+
+/**
+ * @desc forgot Password Token
+ * @route POST api/v1/auth/user/forgotPasswordToken
+ * @access public
+ */
+
+export const forgotPasswordToken = asyncHandler(async (req, res) => {
+  // get body data
+
+  const { email } = req.body;
+
+  // check if email field is empty
+
+  if (!email) return res.status(400).json("Email is required!");
+
+  // got the valid user
+
+  const user = await User.findOne({ email });
+
+  // if user is not found
+
+  if (!user) return res.status(400).json("user Not found!");
+
+  // generate random Token secret
+
+  const secret = crypto.randomBytes(32).toString("hex");
+
+  // generate password reset token
+
+  const resetToken = crypto.createHash("sha256").update(secret).digest("hex");
+
+  // generate token Expire
+
+  const expireToken = Date.now() + 10 * 60 * 1000;
+
+  // update token
+
+  const forgetPassword = await User.findByIdAndUpdate(user._id, {
+    passwordResetToken: resetToken,
+    passwordResetExpires: expireToken,
+  });
+
+  //send mail
+  const sendMail = forgetPasswordEmail({
+    to: user.email,
+    name: `${user.firstName} ${user.lastName}`,
+    token: `http://localhost:3001/resetPassword/${resetToken}`,
+  });
+
+  // user response
+
+  res.status(200).json({ message: "Forget password mail Send" });
+});
+
+/**
+ * @desc reset Password
+ * @route POST api/v1/auth/user/resetPassword
+ * @access public
+ */
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  // get body data
+
+  const { token } = req.params;
+
+  // token validation
+
+  if (!token) return res.status(400).json("Invalid token");
+
+  // get body data
+
+  const { password } = req.body;
+
+  // check field is empty
+
+  if (!password)
+    return res.status(400).json("Password Field must not be empty!");
+
+  // check token is valid
+
+  const user = await User.findOne({
+    passwordResetToken: token,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // user token Expires validation
+
+  if (!user) return res.status(400).json("Token is Expired try to again");
+
+  //password make hash
+
+  const hashPassword = bcrypt.hashSync(password, 10);
+
+  //update password
+
+  user.password = hashPassword;
+  user.passwordResetToken = null;
+  user.passwordResetExpires = null;
+  user.passwordChangedAt = Date.now();
+  user.verify = true;
+  await user.save();
+  // user response
+  res.status(200).json({ message: "password reset done" });
 });
 
 /**
@@ -229,13 +371,90 @@ export const unBlockUser = asyncHandler(async (req, res) => {
 
 export const getWishList = asyncHandler(async (req, res) => {
   // get value
-  const loginUser = req.me;
+  const { _id } = req.me;
 
   // find user wishlist
-  const getWishlist = await User.findById(loginUser._id).populate("wishList");
+  const user = await User.findById(_id).populate("wishList");
 
   //  response
-  return res.status(200).json({ getWishlist, message: "Show all wishlist" });
+  return res
+    .status(200)
+    .json({ wishList: user.wishList, message: "Show all wishlist" });
+});
+
+/**
+ * @desc add to wishlist
+ * @route PUT /api/v1/user/wishlist
+ * @access public
+ */
+
+export const addToWishlist = asyncHandler(async (req, res) => {
+  // get product id from body
+
+  const { productId } = req.body;
+
+  // product id is required validation
+
+  if (!productId)
+    return res.status(400).json({ message: "Product ID Must Be Provided" });
+
+  // find login user
+
+  const { email } = req.me;
+
+  const user = await User.findOne({ email });
+
+  // user not valid
+
+  if (!user) return res.status(400).json({ message: "Invalid User" });
+
+  try {
+    // already added a product to Wishlist
+
+    const alreadyAdded = user.wishList.find(
+      (el) => el.toString() === productId
+    );
+
+    if (alreadyAdded) {
+      const removeWishlist = await User.findByIdAndUpdate(
+        user._id,
+        {
+          $pull: {
+            wishList: productId,
+          },
+        },
+        {
+          new: true,
+        }
+      ).populate("wishList");
+
+      // remove  a product from the wishlist response
+
+      return res.status(200).json({
+        wishList: removeWishlist.wishList,
+        message: "Remove wishlist Item Successful",
+      });
+    } else {
+      const addWishlist = await User.findByIdAndUpdate(
+        user._id,
+        {
+          $push: {
+            wishList: productId,
+          },
+        },
+        {
+          new: true,
+        }
+      ).populate("wishList");
+
+      return res.status(200).json({
+        wishList: addWishlist.wishList,
+        message: " Wishlist Added successful",
+      });
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
 });
 
 /**
@@ -311,9 +530,11 @@ export const AddUserCart = asyncHandler(async (req, res) => {
     getItem.count = cart[i].count;
     getItem.color = cart[i].color;
 
-    let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+    let getPrice = await Product.findById(cart[i]._id)
+      .select("salePrice")
+      .exec();
 
-    getItem.price = getPrice ? getPrice.price : null;
+    getItem.salePrice = getPrice ? getPrice.salePrice : null;
 
     products.push(getItem);
   }
@@ -321,7 +542,7 @@ export const AddUserCart = asyncHandler(async (req, res) => {
   let cartTotal = 0;
 
   for (let i = 0; i < products.length; i++) {
-    cartTotal += products[i].count * products[i].price;
+    cartTotal += products[i].count * products[i].salePrice;
   }
 
   let newCart = await new Cart({
@@ -455,6 +676,7 @@ export const getOrders = asyncHandler(async (req, res) => {
 
   const userOrders = await Order.findOne({ orderBy: user._id })
     .populate("products.product")
+    .populate("products.color")
     .populate("orderBy")
     .exec();
 
@@ -471,6 +693,7 @@ export const getOrders = asyncHandler(async (req, res) => {
 export const getAllOrders = asyncHandler(async (req, res) => {
   const allUserOrders = await Order.find()
     .populate("products.product")
+    .populate("products.color")
     .populate("orderBy")
     .exec();
 
@@ -572,6 +795,7 @@ export const getSingleOrder = asyncHandler(async (req, res) => {
 
   const userOrder = await Order.findOne({ orderby: loginUser._id })
     .populate("products.product")
+    .populate("products.color")
     .populate("orderby");
 
   // response
@@ -593,7 +817,8 @@ export const getOrderUserId = asyncHandler(async (req, res) => {
 
   const userOrder = await Order.findOne({ orderby: _id })
     .populate("products.product")
-    .populate("orderBy");
+    .populate("orderBy")
+    .populate("products.color");
 
   if (!userOrder) {
     return res.json({ message: "This User not order" });

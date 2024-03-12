@@ -20,16 +20,21 @@ import {
   getSingleOrder,
   getOrderUserId,
   getOrders,
+  addToWishlist,
+  forgotPasswordToken,
+  resetPassword,
 } from "../controllers/userController.js";
 
 import { isAdmin, tokenVerify } from "../middlewares/tokenVerify.js";
+import { userMulter } from "../utils/multer.js";
 
 //router
 const router = express.Router();
 
 //routing
 router.route("/").get(tokenVerify, isAdmin, getAllUser).post(createUser);
-router.route("/wishList").get(getWishList);
+router.route("/wishList").get(tokenVerify, getWishList);
+router.route("/wishlist").put(tokenVerify, addToWishlist);
 router
   .route("/cart")
   .get(tokenVerify, getUserCart)
@@ -48,11 +53,13 @@ router
   .route("/:id")
   .get(getSingleUser)
   .delete(tokenVerify, isAdmin, deleteUser)
-  .patch(tokenVerify, isAdmin, updateUser);
+  .patch(tokenVerify, isAdmin, userMulter, updateUser);
 router.route("/address").put(userAddress);
 router.route("/status/:id").patch(tokenVerify, isAdmin, updateUserStatus);
 router.route("/blockUser/:id").get(tokenVerify, isAdmin, blockUser);
 router.route("/unBlockUser/:id").get(tokenVerify, isAdmin, unBlockUser);
+router.route("/forgetPassword").post(forgotPasswordToken);
+router.route("/resetPassword/:token").post(resetPassword);
 
 //export
 export default router;

@@ -11,6 +11,7 @@ import enquireReducer from "../features/enquire/enquireSlice.js";
 import orderReducer from "../features/order/orderSlice.js";
 import tagReducer from "../features/tag/tagSlice.js";
 import couponReducer from "../features/coupon/couponSlice.js";
+import sizeReducer from "../features/size/sizeSlice.js";
 
 // create store
 
@@ -28,6 +29,7 @@ const store = configureStore({
     order: orderReducer,
     tag: tagReducer,
     coupon: couponReducer,
+    size: sizeReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   devTools: true,

@@ -23,7 +23,7 @@ let schema = object({
   category: string().required("Category Is Required"),
 });
 const EditBlog = () => {
-  const title = "Edit Blog - Digitic";
+  const title = "Edit Blog - FLASHMART";
 
   const editor = useRef(null);
 
@@ -35,13 +35,10 @@ const EditBlog = () => {
 
   const { id } = useParams();
 
-  // const [blogLogo, setBlogLogo] = useState([]);
 
   const { blogCategories } = useSelector(getAllBlogsCategoryData);
 
   const { error, message, loader, singleBlog } = useSelector(getAllBlogsData);
-
-  console.log(singleBlog);
 
   // Initialize brandLogo using newBrands
 
@@ -86,8 +83,10 @@ const EditBlog = () => {
       form_data.append("description", values.description);
       form_data.append("category", values.category);
 
-      if (blogLogo && blogLogo.length > 0) {
+      if (blogLogo.length > 0) {
         form_data.append("blogLogo", blogLogo[0].file);
+      } else {
+        form_data.append("removePhoto", true);
       }
 
       dispatch(updateBlog({ id, form_data }));
@@ -119,7 +118,7 @@ const EditBlog = () => {
       dispatch(setMessageEmpty());
       navigate("/blogList");
     }
-  }, [dispatch, error, message,navigate]);
+  }, [dispatch, error, message, navigate]);
 
   // get previous values
 

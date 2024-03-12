@@ -34,7 +34,7 @@ for (let i = 0; i < 46; i++) {
 }
 
 const Dashboard = () => {
-  const title = "Dashboard - Digitic";
+  const title = "Dashboard - FLASHMART";
 
   const data = [
     {

@@ -20,7 +20,7 @@ let schema = object({
 });
 
 const EditBlogCategory = () => {
-  const title = "Edit Blog Category - Digitic";
+  const title = "Edit Blog Category - FLASHMART";
 
   const dispatch = useDispatch();
 

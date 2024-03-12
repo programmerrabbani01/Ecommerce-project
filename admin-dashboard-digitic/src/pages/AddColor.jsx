@@ -17,7 +17,7 @@ let schema = object({
 });
 
 const AddColor = () => {
-  const title = "Add Color - Digitic";
+  const title = "Add Color - FLASHMART";
 
   const dispatch = useDispatch();
 

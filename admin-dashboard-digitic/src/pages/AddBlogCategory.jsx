@@ -16,7 +16,7 @@ let schema = object({
 });
 
 const AddBlogCategory = () => {
-  const title = "Add Blog Category - Digitic";
+  const title = "Add Blog Category - FLASHMART";
 
   const dispatch = useDispatch();
 

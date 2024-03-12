@@ -19,7 +19,7 @@ let schema = object({
 });
 
 const AddCoupon = () => {
-  const title = "Add Coupon - Digitic";
+  const title = "Add Coupon - FLASHMART";
 
   const dispatch = useDispatch();
   

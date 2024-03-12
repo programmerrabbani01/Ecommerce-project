@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -16,12 +16,16 @@ import { MdOutlineColorLens } from "react-icons/md";
 import { FaClipboardList, FaBloggerB } from "react-icons/fa";
 import { RiPhoneFindLine } from "react-icons/ri";
 import {} from "react-icons/io";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logOutUser } from "../../features/auth/authApiSlice.js";
 import { SiCoinmarketcap } from "react-icons/si";
 import { RiCoupon4Line } from "react-icons/ri";
+import { createToaster } from "../../utils/toastify.js";
+import { getAuthData, setMessageEmpty } from "../../features/auth/authSlice.js";
 
 const MainLayout = () => {
+  const { user, error, message } = useSelector(getAuthData);
+
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer },
@@ -36,6 +40,17 @@ const MainLayout = () => {
 
     dispatch(logOutUser());
   };
+
+  useEffect(() => {
+    if (error) {
+      createToaster(error);
+      dispatch(setMessageEmpty());
+    }
+    if (message) {
+      createToaster(message, "success");
+      dispatch(setMessageEmpty());
+    }
+  }, [dispatch, error, message]);
 
   return (
     <>
@@ -112,6 +127,16 @@ const MainLayout = () => {
                     key: "/tagList",
                     icon: <FaClipboardList className="fs-5" />,
                     label: "Tag List",
+                  },
+                  {
+                    key: "/size",
+                    icon: <CiShoppingTag className="fs-5" />,
+                    label: "Add Size",
+                  },
+                  {
+                    key: "/sizeList",
+                    icon: <FaClipboardList className="fs-5" />,
+                    label: "Size List",
                   },
                   {
                     key: "/color",
@@ -214,7 +239,11 @@ const MainLayout = () => {
               <div className="d-flex gap-3 align-items-center dropdown">
                 <div>
                   <img
-                    src="https://stroyka-admin.html.themeforest.scompiler.ru/variants/ltr/images/customers/customer-4-64x64.jpg"
+                    src={
+                      user?.photo
+                        ? user?.photo?.url
+                        : "https://i.ibb.co/DDbjkbw/profile.png"
+                    }
                     alt=""
                     className="topImg"
                   />
@@ -225,8 +254,11 @@ const MainLayout = () => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <h5 className="mb-0">Rabbani</h5>
-                  <p className="mb-0">rabbani@gmail.com</p>
+                  <h5 className="mb-0">
+                    {user &&
+                      `${user?.firstName?.toUpperCase()} ${user?.lastName?.toUpperCase()}`}
+                  </h5>
+                  <p className="mb-0">{user && user?.email}</p>
                 </div>
                 <div
                   className="dropdown-menu"
@@ -236,7 +268,7 @@ const MainLayout = () => {
                     <Link
                       className="dropdown-item py-1 mb-1"
                       style={{ height: "auto", lineHeight: "20px" }}
-                      to="#"
+                      to="/profile"
                     >
                       Profile
                     </Link>

@@ -20,7 +20,7 @@ let schema = object({
 });
 
 const EditCategory = () => {
-  const title = "Add Category - Digitic";
+  const title = "Add Category - FLASHMART";
 
   const dispatch = useDispatch();
 

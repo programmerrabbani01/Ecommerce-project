@@ -14,7 +14,7 @@ let schema = object({
 });
 
 const EditTag = () => {
-  const title = "Add Tag - Digitic";
+  const title = "Add Tag - FLASHMART";
 
   const dispatch = useDispatch();
 

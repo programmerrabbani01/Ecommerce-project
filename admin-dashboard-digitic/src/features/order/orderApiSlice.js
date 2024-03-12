@@ -18,3 +18,22 @@ export const getAllOrders = createAsyncThunk("order/getAllOrders", async () => {
   }
 });
 
+// get all orders
+
+export const getAllUserOrdersById = createAsyncThunk(
+  "order/getAllUserOrdersById",
+  async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5050/api/v1/user/getOrderUserId/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);

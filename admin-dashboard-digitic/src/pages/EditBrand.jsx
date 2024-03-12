@@ -22,7 +22,7 @@ let schema = object({
 });
 
 const EditBrand = () => {
-  const title = "Edit Brand - Digitic";
+  const title = "Edit Brand - FLASHMART";
 
   const dispatch = useDispatch();
 
@@ -101,6 +101,7 @@ const EditBrand = () => {
     }
   }, [dispatch, error, message, navigate]);
 
+  // catch previous values
   useEffect(() => {
     // Check if singleBrand is not null before setting brandLogo
     if (singleBrand) {

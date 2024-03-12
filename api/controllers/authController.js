@@ -16,51 +16,73 @@ import { forgetPasswordEmail } from "../utils/sendMail.js";
  * @access PUBLIC
  */
 
+// export const userRegistration = asyncHandler(async (req, res) => {
+//   // get data
+//   const { firstName, lastName, email, password, mobile } = req.body;
+
+//   // check validation
+//   if (!firstName || !lastName || !email || !password || !mobile) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   // email existence
+//   const userEmailCheck = await User.findOne({ email });
+
+//   if (userEmailCheck) {
+//     return res.status(400).json({ message: "Email already exists" });
+//   }
+
+//   // password hash
+//   const hashPass = bcrypt.hashSync(password, 10);
+
+//   // create new user
+//   const user = await User.create({
+//     firstName,
+//     lastName,
+//     email,
+//     password: hashPass,
+//     mobile,
+//   });
+
+//   res.status(200).json({
+//     message: "User Created successful",
+//   });
+// });
+
 export const userRegistration = asyncHandler(async (req, res) => {
-  // get data
-  const { firstName, lastName, email, password, mobile, role } = req.body;
+  // get body data
+  const { firstName, lastName, email, password, mobile } = req.body;
 
-  // check validation
-  if (!firstName || !lastName || !email || !password || !role || !mobile) {
-    return res.status(400).json({ message: "All fields are required" });
+  // is empty
+  if (!firstName || !lastName || !email || !mobile || !password) {
+    throw new Error("all fields are required");
   }
 
-  // email existence
-  const userEmailCheck = await User.findOne({ email });
+  // find user
+  const user = await User.findOne({ email });
 
-  if (userEmailCheck) {
-    return res.status(400).json({ message: "Email already exists" });
+  //if Email is already exists
+  if (user) {
+    throw new Error("Email already exists");
   }
 
-  // password hash
-  const hashPass = bcrypt.hashSync(password, 10);
+  //password make hash
+  const hashPassword = bcrypt.hashSync(password, 10);
 
-  // create new user
-  const user = await User.create({
+  //create new user
+  const newUser = await User.create({
     firstName,
     lastName,
+    // slug: createSlug(firstName + "-" + lastName),
     email,
-    password: hashPass,
+    password: hashPassword,
     mobile,
-    role,
   });
 
-  // email validation
-
-  // active link token
-  // const token = jwtToken({ email: user?.email }, 1000 * 60 * 60 * 12);
-
-  // const activeLink = `${MAIL_URL}/login/${token}`;
-
-  // // Concatenate first name and last name
-  // const fullName = `${firstName} ${lastName}`;
-
-  // createActiveMail({ to: user.email, name: fullName, token: activeLink });
-
-  res.status(200).json({
-    user,
-    message: "User Created successful",
-  });
+  // response
+  res
+    .status(201)
+    .json({ user: newUser, message: "User Registration successfully" });
 });
 
 /**
@@ -222,21 +244,20 @@ export const updatePassword = asyncHandler(async (req, res) => {
 
   // check field is empty
 
-  if (!oldPassword || !password) {
-    throw new Error("all field are required!");
-  }
+  if (!oldPassword || !password)
+    return res.status(400).json("all field are required!");
+
   // got the valid user
 
   const user = await User.findOne({ email });
 
-  if (!user) {
-    throw new Error("Invalid user");
-  }
+  if (!user) return res.status(400).json("Invalid user");
+
   //check old password is correct
 
-  if (bcrypt.compareSync(oldPassword, user.password) === false) {
-    throw new Error("Old Password is incorrect");
-  }
+  if (bcrypt.compareSync(oldPassword, user.password) === false)
+    return res.status(400).json("Old Password is incorrect");
+
   //password make hash
 
   const hashPassword = bcrypt.hashSync(password, 10);
@@ -267,7 +288,7 @@ export const forgotPasswordToken = asyncHandler(async (req, res) => {
 
   // check if email field is empty
 
-  if (!email) throw new Error("Email is required!");
+  if (!email) return res.status(400).json("Email is required!");
 
   // got the valid user
 
@@ -275,7 +296,7 @@ export const forgotPasswordToken = asyncHandler(async (req, res) => {
 
   // if user is not found
 
-  if (!user) throw new Error("user Not found!");
+  if (!user) return res.status(400).json("user Not found!");
 
   // generate random Token secret
 
@@ -300,14 +321,12 @@ export const forgotPasswordToken = asyncHandler(async (req, res) => {
   const sendMail = forgetPasswordEmail({
     to: user.email,
     name: `${user.firstName} ${user.lastName}`,
-    token: `http://localhost:5050/api/v1/auth/user/reset-password/${resetToken}`,
+    token: `http://localhost:3000/resetPassword/${resetToken}`,
   });
 
   // user response
 
-  res
-    .status(200)
-    .json({ message: "Forget password mail Send", forgetPassword });
+  res.status(200).json({ message: "Forget password mail Send" });
 });
 
 /**
@@ -323,9 +342,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   // token validation
 
-  if (!token) {
-    throw new Error("Invalid token");
-  }
+  if (!token) return res.status(400).json("Invalid token");
 
   // get body data
 
@@ -333,9 +350,9 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   // check field is empty
 
-  if (!password) {
-    throw new Error("Password Field must not be empty!");
-  }
+  if (!password)
+    return res.status(400).json("Password Field must not be empty!");
+
   // check token is valid
 
   const user = await User.findOne({
@@ -345,9 +362,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
   // user token Expires validation
 
-  if (!user) {
-    throw new Error("Token is Expired try to again");
-  }
+  if (!user) return res.status(400).json("Token is Expired try to again");
 
   //password make hash
 
@@ -361,6 +376,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.passwordChangedAt = Date.now();
   user.verify = true;
   await user.save();
-  // user responsive
+  // user response
   res.status(200).json({ message: "password reset done" });
 });

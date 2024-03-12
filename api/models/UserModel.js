@@ -34,8 +34,12 @@ const userSchema = mongoose.Schema(
       default: null,
     },
     photo: {
-      type: String,
-      default: null,
+      url: {
+        type: String,
+      },
+      public_id: {
+        type: String,
+      },
     },
     role: {
       type: String,
